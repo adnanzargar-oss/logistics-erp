@@ -3,7 +3,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dbPath = path.join(__dirname, '..', 'data', 'logistics.db');
+const dataDir = process.env.DATA_DIR || path.join(__dirname, '..', 'data');
+const dbPath = path.join(dataDir, 'logistics.db');
 
 import fs from 'fs';
 fs.mkdirSync(path.dirname(dbPath), { recursive: true });
