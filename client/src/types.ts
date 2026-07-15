@@ -332,4 +332,9 @@ export interface DashboardData {
   recentBookings: { id: number; booking_no: string; consignor_name: string; consignee_name: string; grand_total: number; status: string; created_at: string }[];
   loadingStats: { total: number; in_transit: number; received: number };
   customerCount: number;
+  todayOps: {
+    loadings: number;
+    receivings: number;
+    deliveries: number;
+  };
 }

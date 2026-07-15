@@ -15,3 +15,4 @@ export { dashboardRouter } from './dashboard.js';
 export { receivingsRouter } from './receivings.js';
 export { deliveryPersonsRouter } from './deliveryPersons.js';
 export { default as authRouter } from './auth.js';
+export { trackingRouter } from './tracking.js';

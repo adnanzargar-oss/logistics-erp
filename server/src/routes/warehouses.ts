@@ -70,3 +70,61 @@ warehousesRouter.delete('/:id', (req, res) => {
     res.status(400).json({ error: (err as Error).message });
   }
 });
+
+warehousesRouter.get('/:id/monthly-report', (req, res) => {
+  const { month } = req.query;
+  const monthStr = (month as string) || new Date().toISOString().slice(0, 7);
+  const warehouse = db.prepare('SELECT * FROM warehouses WHERE id = ?').get(req.params.id) as any;
+  if (!warehouse) return res.status(404).json({ error: 'Warehouse not found' });
+
+  const daysInMonth = new Date(Number(monthStr.split('-')[0]), Number(monthStr.split('-')[1]), 0).getDate();
+
+  const dailyReport: any[] = [];
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${monthStr}-${String(d).padStart(2, '0')}`;
+    const loadings = db.prepare(`
+      SELECT COUNT(DISTINCT l.id) as count FROM loadings l
+      JOIN loading_items li ON li.loading_id = l.id
+      JOIN bookings b ON b.id = li.booking_id
+      WHERE b.pickup_warehouse_id = ? AND l.loading_date = ?
+    `).get(req.params.id, dateStr) as any;
+
+    const receivings = db.prepare(`
+      SELECT COUNT(*) as count, COALESCE(SUM(ri.bags_received), 0) as nags_received, COALESCE(SUM(ri.short_bags), 0) as shortage
+      FROM receivings r
+      JOIN receiving_items ri ON ri.receiving_id = r.id
+      WHERE r.warehouse_id = ? AND r.receiving_date = ?
+    `).get(req.params.id, dateStr) as any;
+
+    const deliveries = db.prepare(`
+      SELECT COUNT(DISTINCT d.id) as count FROM deliveries d
+      JOIN delivery_items di ON di.delivery_id = d.id
+      JOIN bookings b ON b.id = di.booking_id
+      WHERE b.delivery_warehouse_id = ? AND d.delivery_date = ?
+    `).get(req.params.id, dateStr) as any;
+
+    dailyReport.push({
+      date: dateStr,
+      loadings: loadings?.count || 0,
+      receivings: receivings?.count || 0,
+      nags_received: receivings?.nags_received || 0,
+      shortage: receivings?.shortage || 0,
+      deliveries: deliveries?.count || 0,
+    });
+  }
+
+  const totals = dailyReport.reduce((acc, d) => ({
+    loadings: acc.loadings + d.loadings,
+    receivings: acc.receivings + d.receivings,
+    nags_received: acc.nags_received + d.nags_received,
+    shortage: acc.shortage + d.shortage,
+    deliveries: acc.deliveries + d.deliveries,
+  }), { loadings: 0, receivings: 0, nags_received: 0, shortage: 0, deliveries: 0 });
+
+  res.json({
+    warehouse,
+    month: monthStr,
+    dailyReport,
+    totals,
+  });
+});

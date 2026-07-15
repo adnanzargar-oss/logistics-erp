@@ -74,6 +74,20 @@ dashboardRouter.get('/', (_req, res) => {
 
     const customerCount = db.prepare(`SELECT COUNT(*) as total FROM customers`).all() as any[];
 
+    const today = new Date().toISOString().split('T')[0];
+
+    const todayLoadings = db.prepare(`
+      SELECT COUNT(*) as count FROM loadings WHERE loading_date = ?
+    `).get(today) as any;
+
+    const todayReceivings = db.prepare(`
+      SELECT COUNT(*) as count FROM receivings WHERE receiving_date = ?
+    `).get(today) as any;
+
+    const todayDeliveries = db.prepare(`
+      SELECT COUNT(*) as count FROM deliveries WHERE delivery_date = ?
+    `).get(today) as any;
+
     res.json({
       bookings: bookingStats,
       vehicles: vehicleStats,
@@ -85,6 +99,11 @@ dashboardRouter.get('/', (_req, res) => {
       recentBookings,
       loadingStats: loadingStats[0],
       customerCount: customerCount[0].total,
+      todayOps: {
+        loadings: todayLoadings?.count || 0,
+        receivings: todayReceivings?.count || 0,
+        deliveries: todayDeliveries?.count || 0,
+      },
     });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });

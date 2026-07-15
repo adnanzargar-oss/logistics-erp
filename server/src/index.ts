@@ -19,6 +19,7 @@ import {
   receivingsRouter,
   deliveryPersonsRouter,
   authRouter,
+  trackingRouter,
 } from './routes/index.js';
 
 const app = express();
@@ -44,6 +45,7 @@ app.use('/api/dashboard', dashboardRouter);
 app.use('/api/receivings', receivingsRouter);
 app.use('/api/delivery-persons', deliveryPersonsRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/track', trackingRouter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });

@@ -94,6 +94,10 @@ export const api = {
     update: (id: number, data: any) => request<any>(`/warehouses/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     delete: (id: number) => request<any>(`/warehouses/${id}`, { method: 'DELETE' }),
   },
+  deliveries: {
+    list: () => request<any[]>('/deliveries'),
+    get: (id: number) => request<any>(`/deliveries/${id}`),
+  },
   deliveryPersons: {
     list: (status?: string) => request<any[]>(`/delivery-persons${status ? `?status=${status}` : ''}`),
     get: (id: number) => request<any>(`/delivery-persons/${id}`),

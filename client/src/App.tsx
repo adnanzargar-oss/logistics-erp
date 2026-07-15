@@ -20,6 +20,8 @@ import Loadings from './components/Loadings';
 import Receivings from './components/Receivings';
 import Deliveries from './components/Deliveries';
 import Reports from './components/Reports';
+import BarcodePrint from './components/BarcodePrint';
+import Calendar from './components/Calendar';
 
 function AppContent() {
   const { user, loading, logout } = useAuth();
@@ -62,6 +64,8 @@ function AppContent() {
           invoices: <Invoices />,
           payments: <Payments />,
           expenses: <Expenses />,
+          barcodes: <BarcodePrint />,
+          calendar: <Calendar />,
           warehouses: <Warehouses />,
           receivings: <Receivings />,
           reports: <Reports />,
