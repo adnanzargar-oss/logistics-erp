@@ -1,0 +1,17 @@
+export { bookingsRouter } from './bookings.js';
+export { vehiclesRouter } from './vehicles.js';
+export { driversRouter } from './drivers.js';
+export { fleetRouter } from './fleet.js';
+export { customersRouter } from './customers.js';
+export { fuelRouter } from './fuel.js';
+export { maintenanceRouter } from './maintenance.js';
+export { invoicesRouter } from './invoices.js';
+export { paymentsRouter } from './payments.js';
+export { expensesRouter } from './expenses.js';
+export { warehousesRouter } from './warehouses.js';
+export { loadingsRouter } from './loadings.js';
+export { deliveriesRouter } from './deliveries.js';
+export { dashboardRouter } from './dashboard.js';
+export { receivingsRouter } from './receivings.js';
+export { deliveryPersonsRouter } from './deliveryPersons.js';
+export { default as authRouter } from './auth.js';
