@@ -43,3 +43,11 @@ input[type='number']::-webkit-inner-spin-button {
 input[type='number'] {
   -moz-appearance: textfield;
 }
+
+input:not([type]):not([type='number']):not([type='date']):not([type='email']):not([type='password']):not([type='search']),
+input[type='text'],
+textarea {
+  text-transform: capitalize;
+}
+
+

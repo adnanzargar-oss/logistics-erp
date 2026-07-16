@@ -12,7 +12,7 @@ import {
   invoicesRouter,
   paymentsRouter,
   expensesRouter,
-  warehousesRouter,
+  warehousesRouter, camerasRouter,
   loadingsRouter,
   deliveriesRouter,
   dashboardRouter,
@@ -20,13 +20,14 @@ import {
   deliveryPersonsRouter,
   authRouter,
   trackingRouter,
+  dataioRouter,
 } from './routes/index.js';
 
 const app = express();
 const PORT = 3001;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 
 app.use('/api/bookings', bookingsRouter);
 app.use('/api/vehicles', vehiclesRouter);
@@ -39,6 +40,7 @@ app.use('/api/invoices', invoicesRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/expenses', expensesRouter);
 app.use('/api/warehouses', warehousesRouter);
+app.use('/api', camerasRouter);
 app.use('/api/loadings', loadingsRouter);
 app.use('/api/deliveries', deliveriesRouter);
 app.use('/api/dashboard', dashboardRouter);
@@ -46,6 +48,7 @@ app.use('/api/receivings', receivingsRouter);
 app.use('/api/delivery-persons', deliveryPersonsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/track', trackingRouter);
+app.use('/api/dataio', dataioRouter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });

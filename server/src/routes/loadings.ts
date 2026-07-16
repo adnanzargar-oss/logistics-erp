@@ -3,14 +3,17 @@ import db from '../database.js';
 
 export const loadingsRouter = Router();
 
-// List all loadings with vehicle/driver info
+// List all loadings with vehicle/driver/warehouse info
 loadingsRouter.get('/', (_req, res) => {
   const list = db.prepare(`
     SELECT l.*, v.reg_number as vehicle_reg, d.name as driver_name, d.license_number,
+           fw.name as from_warehouse_name, tw.name as to_warehouse_name,
            (SELECT COUNT(*) FROM loading_items WHERE loading_id = l.id) as item_count
     FROM loadings l
     LEFT JOIN vehicles v ON l.vehicle_id = v.id
     LEFT JOIN drivers d ON l.driver_id = d.id
+    LEFT JOIN warehouses fw ON l.from_warehouse_id = fw.id
+    LEFT JOIN warehouses tw ON l.to_warehouse_id = tw.id
     ORDER BY l.created_at DESC
   `).all() as any[];
 
@@ -36,10 +39,13 @@ loadingsRouter.get('/search', (req, res) => {
   if (!q) return res.json([]);
   const list = db.prepare(`
     SELECT l.*, v.reg_number as vehicle_reg, d.name as driver_name, d.phone as driver_phone, d.license_number,
+           fw.name as from_warehouse_name, tw.name as to_warehouse_name,
            (SELECT COUNT(*) FROM loading_items WHERE loading_id = l.id) as item_count
     FROM loadings l
     LEFT JOIN vehicles v ON l.vehicle_id = v.id
     LEFT JOIN drivers d ON l.driver_id = d.id
+    LEFT JOIN warehouses fw ON l.from_warehouse_id = fw.id
+    LEFT JOIN warehouses tw ON l.to_warehouse_id = tw.id
     WHERE l.loading_no LIKE ?
     ORDER BY l.created_at DESC
   `).all(`%${q}%`) as any[];
@@ -63,10 +69,13 @@ loadingsRouter.get('/search', (req, res) => {
 loadingsRouter.get('/:id', (req, res) => {
   const loading = db.prepare(`
     SELECT l.*, v.reg_number as vehicle_reg, v.type as vehicle_type,
-           d.name as driver_name, d.phone as driver_phone, d.license_number
+           d.name as driver_name, d.phone as driver_phone, d.license_number,
+           fw.name as from_warehouse_name, tw.name as to_warehouse_name
     FROM loadings l
     LEFT JOIN vehicles v ON l.vehicle_id = v.id
     LEFT JOIN drivers d ON l.driver_id = d.id
+    LEFT JOIN warehouses fw ON l.from_warehouse_id = fw.id
+    LEFT JOIN warehouses tw ON l.to_warehouse_id = tw.id
     WHERE l.id = ?
   `).get(req.params.id) as any;
   if (!loading) return res.status(404).json({ error: 'Loading not found' });
@@ -90,12 +99,12 @@ loadingsRouter.get('/:id', (req, res) => {
 
 // Create a new loading with booking items
 loadingsRouter.post('/', (req, res) => {
-  const { vehicle_id, driver_id, loading_date, booking_ids } = req.body;
+  const { vehicle_id, driver_id, loading_date, booking_ids, from_warehouse_id, to_warehouse_id } = req.body;
   const loadingNo = 'LD-' + Date.now().toString(36).toUpperCase();
   try {
     const result = db.prepare(
-      'INSERT INTO loadings (loading_no, vehicle_id, driver_id, loading_date) VALUES (?,?,?,?)'
-    ).run(loadingNo, vehicle_id, driver_id || null, loading_date);
+      'INSERT INTO loadings (loading_no, vehicle_id, driver_id, loading_date, from_warehouse_id, to_warehouse_id) VALUES (?,?,?,?,?,?)'
+    ).run(loadingNo, vehicle_id, driver_id || null, loading_date, from_warehouse_id || null, to_warehouse_id || null);
 
     const loadingId = result.lastInsertRowid;
     const insertItem = db.prepare('INSERT INTO loading_items (loading_id, booking_id) VALUES (?, ?)');
@@ -127,3 +136,5 @@ loadingsRouter.delete('/:id', (req, res) => {
     res.status(400).json({ error: (err as Error).message });
   }
 });
+
+

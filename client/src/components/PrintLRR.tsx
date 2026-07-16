@@ -2,296 +2,296 @@ import { Booking } from '../types';
 import JsBarcode from 'jsbarcode';
 
 const COMPANY = {
-  name: 'Planet Transport Pvt Ltd.',
-  regdOffice: 'Tengpora, Byepass Srinagar-190010',
-  deliveryAddress: 'Tengpora Bypass, Near New City Hospital',
-  phone: '9419428505, 9906661400',
+ name: 'Planet Transport Pvt Ltd.',
+ regdOffice: 'Tengpora, Byepass Srinagar-190010',
+ deliveryAddress: 'Tengpora Bypass, Near New City Hospital',
+ phone: '9419428505, 9906661400',
 };
 
 const COPY_LABELS = ['Customer Copy', 'Driver Copy', 'Office Copy'];
 
 function numToWords(n: number): string {
-  if (!n || n === 0) return 'Zero';
-  const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-  const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-  const convert = (num: number): string => {
-    if (num < 20) return ones[num];
-    if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 ? ' ' + ones[num % 10] : '');
-    if (num < 1000) return ones[Math.floor(num / 100)] + ' Hundred' + (num % 100 ? ' ' + convert(num % 100) : '');
-    if (num < 100000) return convert(Math.floor(num / 1000)) + ' Thousand' + (num % 1000 ? ' ' + convert(num % 1000) : '');
-    if (num < 10000000) return convert(Math.floor(num / 100000)) + ' Lakh' + (num % 100000 ? ' ' + convert(num % 100000) : '');
-    return convert(Math.floor(num / 10000000)) + ' Crore' + (num % 10000000 ? ' ' + convert(num % 10000000) : '');
-  };
-  return convert(Math.round(n));
+ if (!n || n === 0) return 'Zero';
+ const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+ const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+ const convert = (num: number): string => {
+ if (num < 20) return ones[num];
+ if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 ? ' ' + ones[num % 10] : '');
+ if (num < 1000) return ones[Math.floor(num / 100)] + ' Hundred' + (num % 100 ? ' ' + convert(num % 100) : '');
+ if (num < 100000) return convert(Math.floor(num / 1000)) + ' Thousand' + (num % 1000 ? ' ' + convert(num % 1000) : '');
+ if (num < 10000000) return convert(Math.floor(num / 100000)) + ' Lakh' + (num % 100000 ? ' ' + convert(num % 100000) : '');
+ return convert(Math.floor(num / 10000000)) + ' Crore' + (num % 10000000 ? ' ' + convert(num % 10000000) : '');
+ };
+ return convert(Math.round(n));
 }
 
 function generateBarcodeSVG(value: string): string {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  JsBarcode(svg, value, { format: 'CODE128', width: 1.5, height: 35, displayValue: true, fontSize: 12, textMargin: 2, margin: 0 });
-  return svg.outerHTML;
+ const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+ JsBarcode(svg, value, { format: 'CODE128', width: 1.5, height: 35, displayValue: true, fontSize: 12, textMargin: 2, margin: 0 });
+ return svg.outerHTML;
 }
 
 function LRRPrintHTML(booking: Booking, copyLabel: string, barcodeSvg: string): string {
-      const badgeColor: Record<string, string> = {
-        'Customer Copy': '#dc2626',
-        'Driver Copy': '#2563eb',
-        'Office Copy': '#16a34a',
-      };
-  return `
-    <div class="lr-page">
-      <div class="watermark">
-        <svg viewBox="0 0 468.62 308.07" xmlns="http://www.w3.org/2000/svg">
-          <path fill="#ef453c" d="M204.18,163.65c21.38,24.62-15.53,62.07-32.17,29.03-14.83-.59-95.46-16.1-64.28-36.02,21.86,5.71,42.78,17.49,65.73,17.49,0-.19-.01-.39-.02-.58-10.93-3.18-81.37-12.81-61.44-28.05-31.28-12.46-79.7-55.6-22.06-70.16-31.1-1.69-110.39,8.25-73.7,53.75,15.36,18.78,38.28,31.83,59.47,43.55,15,4.77,10.99,24.08,18.13,35.66,8.79,22.99,24.43,45.98,44.43,60.52,2.98,4.08,8.62,8.62,13.24,9.9,60.77,44.39,153.5,29.63,200.41-28.35-22.43-3.02-44-7.63-65.81-13.18,80.28,9.01,280.12-7.83,112.46-94.04,67.56,68.06-90.76,54.84-125.67,47.1.05,9.9-50.1.38-61.18,2.07-4.85-6.15,7.38-25.8-7.54-28.69ZM384.85,123.81C357.69-25.47,140.95-41.62,93.69,101.82c.61,3.17-5.24,4.51-1.38,7,9.21,5.65,19.63,15.34,29.75,17.09,27.37-16.04,59.22-7.19,87.79.38,2.78-6.71,5.54-13.37,8.4-20.27-32.96-4.77-80.02-8.3-18.3-28.69,29.36-7.78,60.45.39,89.34,7.12,12.32,15.97-24.52,95.41-1.41,90.6,25.89-106.78-8.36-110.72,96.98-51.24ZM140.3,159.38c5.43-20.2,10.72-21.22-12.53-25.83-6.58-2.1-5.93,9.46-8.64,13.48-4.76,10.27,14.8,8.25,21.17,12.36ZM235.79,132.05c6.24-.95,4.53-15.02,7.61-20.62-2.49-3.49-16.04-6.4-18.28-.63-6.74,21.67-12.66,16.33,10.68,21.25ZM195.9,174.31c-5.08,4.63-7.12,12.65-3.31,19.31,11.39,7.55,17.62-24.24,3.31-19.31ZM363.57,169.58c0-.19.01-.37.02-.56-74.01-8.8-74.42,6.46-.02.56ZM310.6,156.75c17.77,1.08,34.62,1.35,51.97,2.72-10.91-.92-48.76-14.53-51.97-2.72ZM362.57,149.68c.05-.2.1-.4.15-.6-63.25-20.67-66.13-6.53-.15.6ZM362.37,138.24c.1-.24.21-.47.31-.71-58.85-24-62.7-12.29-.31.71ZM320.79,111.9c10.24,3.66,22.28,9.45,32.54,10.67-5.36-2.2-32.29-20.07-32.54-10.67Z"/>
-          <path fill="#2c2660" d="M316.71,195.75c56.09,3.79,132.62-1.53,81.87-52.57,167.77,86.27-32.39,103.03-112.46,94.04,21.81,5.54,43.38,10.16,65.81,13.18-46.91,57.98-139.65,72.74-200.41,28.35-4.62-1.27-10.26-5.81-13.24-9.9-20-14.53-35.64-37.53-44.43-60.51-7.13-11.58-3.13-30.9-18.12-35.66-21.19-11.73-44.12-24.77-59.48-43.55-36.66-45.51,42.57-55.41,73.7-53.75-57.67,14.58-9.19,57.7,22.06,70.16-19.92,15.22,50.4,24.85,61.44,28.05,0,.19.01.39.02.58-22.96,0-43.87-11.79-65.73-17.49-31.12,19.93,49.3,35.4,64.28,36.02,16.68,33.06,53.53-4.46,32.18-29.03,14.92,2.92,2.69,22.52,7.53,28.68,10.98-1.64,61.52,7.78,61.19-2.06,8.68,1.93,25.11,4.21,43.8,5.48"/>
-        </svg>
-      </div>
-      <div class="copy-badge" style="background:${badgeColor[copyLabel] || '#dc2626'};">${copyLabel}</div>
+ const badgeColor: Record<string, string> = {
+ 'Customer Copy': '#dc2626',
+ 'Driver Copy': '#2563eb',
+ 'Office Copy': '#16a34a',
+ };
+ return `
+ <div class="lr-page">
+ <div class="watermark">
+ <svg viewBox="0 0 468.62 308.07" xmlns="http://www.w3.org/2000/svg">
+ <path fill="#ef453c" d="M204.18,163.65c21.38,24.62-15.53,62.07-32.17,29.03-14.83-.59-95.46-16.1-64.28-36.02,21.86,5.71,42.78,17.49,65.73,17.49,0-.19-.01-.39-.02-.58-10.93-3.18-81.37-12.81-61.44-28.05-31.28-12.46-79.7-55.6-22.06-70.16-31.1-1.69-110.39,8.25-73.7,53.75,15.36,18.78,38.28,31.83,59.47,43.55,15,4.77,10.99,24.08,18.13,35.66,8.79,22.99,24.43,45.98,44.43,60.52,2.98,4.08,8.62,8.62,13.24,9.9,60.77,44.39,153.5,29.63,200.41-28.35-22.43-3.02-44-7.63-65.81-13.18,80.28,9.01,280.12-7.83,112.46-94.04,67.56,68.06-90.76,54.84-125.67,47.1.05,9.9-50.1.38-61.18,2.07-4.85-6.15,7.38-25.8-7.54-28.69ZM384.85,123.81C357.69-25.47,140.95-41.62,93.69,101.82c.61,3.17-5.24,4.51-1.38,7,9.21,5.65,19.63,15.34,29.75,17.09,27.37-16.04,59.22-7.19,87.79.38,2.78-6.71,5.54-13.37,8.4-20.27-32.96-4.77-80.02-8.3-18.3-28.69,29.36-7.78,60.45.39,89.34,7.12,12.32,15.97-24.52,95.41-1.41,90.6,25.89-106.78-8.36-110.72,96.98-51.24ZM140.3,159.38c5.43-20.2,10.72-21.22-12.53-25.83-6.58-2.1-5.93,9.46-8.64,13.48-4.76,10.27,14.8,8.25,21.17,12.36ZM235.79,132.05c6.24-.95,4.53-15.02,7.61-20.62-2.49-3.49-16.04-6.4-18.28-.63-6.74,21.67-12.66,16.33,10.68,21.25ZM195.9,174.31c-5.08,4.63-7.12,12.65-3.31,19.31,11.39,7.55,17.62-24.24,3.31-19.31ZM363.57,169.58c0-.19.01-.37.02-.56-74.01-8.8-74.42,6.46-.02.56ZM310.6,156.75c17.77,1.08,34.62,1.35,51.97,2.72-10.91-.92-48.76-14.53-51.97-2.72ZM362.57,149.68c.05-.2.1-.4.15-.6-63.25-20.67-66.13-6.53-.15.6ZM362.37,138.24c.1-.24.21-.47.31-.71-58.85-24-62.7-12.29-.31.71ZM320.79,111.9c10.24,3.66,22.28,9.45,32.54,10.67-5.36-2.2-32.29-20.07-32.54-10.67Z"/>
+ <path fill="#2c2660" d="M316.71,195.75c56.09,3.79,132.62-1.53,81.87-52.57,167.77,86.27-32.39,103.03-112.46,94.04,21.81,5.54,43.38,10.16,65.81,13.18-46.91,57.98-139.65,72.74-200.41,28.35-4.62-1.27-10.26-5.81-13.24-9.9-20-14.53-35.64-37.53-44.43-60.51-7.13-11.58-3.13-30.9-18.12-35.66-21.19-11.73-44.12-24.77-59.48-43.55-36.66-45.51,42.57-55.41,73.7-53.75-57.67,14.58-9.19,57.7,22.06,70.16-19.92,15.22,50.4,24.85,61.44,28.05,0,.19.01.39.02.58-22.96,0-43.87-11.79-65.73-17.49-31.12,19.93,49.3,35.4,64.28,36.02,16.68,33.06,53.53-4.46,32.18-29.03,14.92,2.92,2.69,22.52,7.53,28.68,10.98-1.64,61.52,7.78,61.19-2.06,8.68,1.93,25.11,4.21,43.8,5.48"/>
+ </svg>
+ </div>
+ <div class="copy-badge" style="background:${badgeColor[copyLabel] || '#dc2626'};">${copyLabel}</div>
 
-      <!-- Header -->
-      <div class="header">
-        <div class="header-left">
-          <div class="brand">
-            <svg class="logo" viewBox="0 0 468.62 308.07" xmlns="http://www.w3.org/2000/svg">
-              <path fill="#fff" d="M204.18,163.65c21.38,24.62-15.53,62.07-32.17,29.03-14.83-.59-95.46-16.1-64.28-36.02,21.86,5.71,42.78,17.49,65.73,17.49,0-.19-.01-.39-.02-.58-10.93-3.18-81.37-12.81-61.44-28.05-31.28-12.46-79.7-55.6-22.06-70.16-31.1-1.69-110.39,8.25-73.7,53.75,15.36,18.78,38.28,31.83,59.47,43.55,15,4.77,10.99,24.08,18.13,35.66,8.79,22.99,24.43,45.98,44.43,60.52,2.98,4.08,8.62,8.62,13.24,9.9,60.77,44.39,153.5,29.63,200.41-28.35-22.43-3.02-44-7.63-65.81-13.18,80.28,9.01,280.12-7.83,112.46-94.04,67.56,68.06-90.76,54.84-125.67,47.1.05,9.9-50.1.38-61.18,2.07-4.85-6.15,7.38-25.8-7.54-28.69ZM384.85,123.81C357.69-25.47,140.95-41.62,93.69,101.82c.61,3.17-5.24,4.51-1.38,7,9.21,5.65,19.63,15.34,29.75,17.09,27.37-16.04,59.22-7.19,87.79.38,2.78-6.71,5.54-13.37,8.4-20.27-32.96-4.77-80.02-8.3-18.3-28.69,29.36-7.78,60.45.39,89.34,7.12,12.32,15.97-24.52,95.41-1.41,90.6,25.89-106.78-8.36-110.72,96.98-51.24ZM140.3,159.38c5.43-20.2,10.72-21.22-12.53-25.83-6.58-2.1-5.93,9.46-8.64,13.48-4.76,10.27,14.8,8.25,21.17,12.36ZM235.79,132.05c6.24-.95,4.53-15.02,7.61-20.62-2.49-3.49-16.04-6.4-18.28-.63-6.74,21.67-12.66,16.33,10.68,21.25ZM195.9,174.31c-5.08,4.63-7.12,12.65-3.31,19.31,11.39,7.55,17.62-24.24,3.31-19.31ZM363.57,169.58c0-.19.01-.37.02-.56-74.01-8.8-74.42,6.46-.02.56ZM310.6,156.75c17.77,1.08,34.62,1.35,51.97,2.72-10.91-.92-48.76-14.53-51.97-2.72ZM362.57,149.68c.05-.2.1-.4.15-.6-63.25-20.67-66.13-6.53-.15.6ZM362.37,138.24c.1-.24.21-.47.31-.71-58.85-24-62.7-12.29-.31.71ZM320.79,111.9c10.24,3.66,22.28,9.45,32.54,10.67-5.36-2.2-32.29-20.07-32.54-10.67Z"/>
-              <path fill="#2c2660" d="M316.71,195.75c56.09,3.79,132.62-1.53,81.87-52.57,167.77,86.27-32.39,103.03-112.46,94.04,21.81,5.54,43.38,10.16,65.81,13.18-46.91,57.98-139.65,72.74-200.41,28.35-4.62-1.27-10.26-5.81-13.24-9.9-20-14.53-35.64-37.53-44.43-60.51-7.13-11.58-3.13-30.9-18.12-35.66-21.19-11.73-44.12-24.77-59.48-43.55-36.66-45.51,42.57-55.41,73.7-53.75-57.67,14.58-9.19,57.7,22.06,70.16-19.92,15.22,50.4,24.85,61.44,28.05,0,.19.01.39.02.58-22.96,0-43.87-11.79-65.73-17.49-31.12,19.93,49.3,35.4,64.28,36.02,16.68,33.06,53.53-4.46,32.18-29.03,14.92,2.92,2.69,22.52,7.53,28.68,10.98-1.64,61.52,7.78,61.19-2.06,8.68,1.93,25.11,4.21,43.8,5.48"/>
-              <path fill="#ef453c" d="M384.85,123.81c-105.54-59.71-71.07-55.18-96.98,51.24-23.07,5.13,13.72-74.92,1.41-90.6-28.87-6.73-59.97-14.9-89.33-7.12-61.65,20.38-14.75,23.91,18.31,28.69-2.86,6.9-5.62,13.56-8.4,20.27-28.57-7.57-60.43-16.41-87.79-.38-10.15-1.73-20.52-11.45-29.76-17.08-3.81-2.51,1.93-3.81,1.39-7.01,47.27-143.49,264.07-127.22,291.16,21.99Z"/>
-              <path fill="#2c2660" d="M140.3,159.38c-6.38-4.09-25.93-2.09-21.17-12.35,2.7-4.03,2.07-15.57,8.64-13.48,23.25,4.61,17.96,5.65,12.53,25.84Z"/>
-              <path fill="#ef453c" d="M235.79,132.05c-23.36-4.91-17.4.39-10.68-21.25,2.26-5.81,15.78-2.84,18.28.62-3.07,5.62-1.37,19.66-7.61,20.63Z"/>
-              <path fill="#2c2660" d="M195.9,174.31c13.85-4.72,8.66,25.42-2.88,19.76-4.53-6.39-2.23-15.13,2.88-19.76Z"/>
-              <path fill="#ef453c" d="M363.57,169.58c-74.78,5.89-73.62-9.36.02-.56,0,.19-.01.37-.02.56Z"/>
-              <path fill="#ef453c" d="M310.6,156.75c3.06-11.8,41.14,1.79,51.97,2.72-17.35-1.37-34.2-1.64-51.97-2.72Z"/>
-              <path fill="#ef453c" d="M362.57,149.68c-66.25-7.2-62.82-21.21.15-.6-.05.2-.1.4-.15.6Z"/>
-              <path fill="#ef453c" d="M362.37,138.24c-62.63-13.07-58.31-24.65.31-.71-.1.24-.21.47-.31.71Z"/>
-              <path fill="#ef453c" d="M320.79,111.9c1.24-9.23,26.56,8.35,32.54,10.67-10.26-1.21-22.3-7-32.54-10.67Z"/>
-            </svg>
-            <div>
-              <h1>${COMPANY.name}</h1>
-              <div class="header-detail">${COMPANY.regdOffice}</div>
-              <div class="header-detail" style="font-weight:700;">GSTIN: 01AAOCP0974B1ZQ</div>
-              <div class="header-phones"><span>Delhi: 9555251516</span><span>Srinagar: 9906661400</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="header-right">
-          <div class="lr-box">
-            <span class="lr-label">LR No</span>
-            <span class="lr-value">${booking.booking_no}</span>
-            <span class="lr-label" style="margin-top:4px;">Date</span>
-            <span class="lr-value">${booking.lr_date ? new Date(booking.lr_date).toLocaleDateString('en-IN') : '-'}</span>
-          </div>
-          <div class="barcode-wrap">${barcodeSvg}</div>
-        </div>
-      </div>
+ <!-- Header -->
+ <div class="header">
+ <div class="header-left">
+ <div class="brand">
+ <svg class="logo" viewBox="0 0 468.62 308.07" xmlns="http://www.w3.org/2000/svg">
+ <path fill="#fff" d="M204.18,163.65c21.38,24.62-15.53,62.07-32.17,29.03-14.83-.59-95.46-16.1-64.28-36.02,21.86,5.71,42.78,17.49,65.73,17.49,0-.19-.01-.39-.02-.58-10.93-3.18-81.37-12.81-61.44-28.05-31.28-12.46-79.7-55.6-22.06-70.16-31.1-1.69-110.39,8.25-73.7,53.75,15.36,18.78,38.28,31.83,59.47,43.55,15,4.77,10.99,24.08,18.13,35.66,8.79,22.99,24.43,45.98,44.43,60.52,2.98,4.08,8.62,8.62,13.24,9.9,60.77,44.39,153.5,29.63,200.41-28.35-22.43-3.02-44-7.63-65.81-13.18,80.28,9.01,280.12-7.83,112.46-94.04,67.56,68.06-90.76,54.84-125.67,47.1.05,9.9-50.1.38-61.18,2.07-4.85-6.15,7.38-25.8-7.54-28.69ZM384.85,123.81C357.69-25.47,140.95-41.62,93.69,101.82c.61,3.17-5.24,4.51-1.38,7,9.21,5.65,19.63,15.34,29.75,17.09,27.37-16.04,59.22-7.19,87.79.38,2.78-6.71,5.54-13.37,8.4-20.27-32.96-4.77-80.02-8.3-18.3-28.69,29.36-7.78,60.45.39,89.34,7.12,12.32,15.97-24.52,95.41-1.41,90.6,25.89-106.78-8.36-110.72,96.98-51.24ZM140.3,159.38c5.43-20.2,10.72-21.22-12.53-25.83-6.58-2.1-5.93,9.46-8.64,13.48-4.76,10.27,14.8,8.25,21.17,12.36ZM235.79,132.05c6.24-.95,4.53-15.02,7.61-20.62-2.49-3.49-16.04-6.4-18.28-.63-6.74,21.67-12.66,16.33,10.68,21.25ZM195.9,174.31c-5.08,4.63-7.12,12.65-3.31,19.31,11.39,7.55,17.62-24.24,3.31-19.31ZM363.57,169.58c0-.19.01-.37.02-.56-74.01-8.8-74.42,6.46-.02.56ZM310.6,156.75c17.77,1.08,34.62,1.35,51.97,2.72-10.91-.92-48.76-14.53-51.97-2.72ZM362.57,149.68c.05-.2.1-.4.15-.6-63.25-20.67-66.13-6.53-.15.6ZM362.37,138.24c.1-.24.21-.47.31-.71-58.85-24-62.7-12.29-.31.71ZM320.79,111.9c10.24,3.66,22.28,9.45,32.54,10.67-5.36-2.2-32.29-20.07-32.54-10.67Z"/>
+ <path fill="#2c2660" d="M316.71,195.75c56.09,3.79,132.62-1.53,81.87-52.57,167.77,86.27-32.39,103.03-112.46,94.04,21.81,5.54,43.38,10.16,65.81,13.18-46.91,57.98-139.65,72.74-200.41,28.35-4.62-1.27-10.26-5.81-13.24-9.9-20-14.53-35.64-37.53-44.43-60.51-7.13-11.58-3.13-30.9-18.12-35.66-21.19-11.73-44.12-24.77-59.48-43.55-36.66-45.51,42.57-55.41,73.7-53.75-57.67,14.58-9.19,57.7,22.06,70.16-19.92,15.22,50.4,24.85,61.44,28.05,0,.19.01.39.02.58-22.96,0-43.87-11.79-65.73-17.49-31.12,19.93,49.3,35.4,64.28,36.02,16.68,33.06,53.53-4.46,32.18-29.03,14.92,2.92,2.69,22.52,7.53,28.68,10.98-1.64,61.52,7.78,61.19-2.06,8.68,1.93,25.11,4.21,43.8,5.48"/>
+ <path fill="#ef453c" d="M384.85,123.81c-105.54-59.71-71.07-55.18-96.98,51.24-23.07,5.13,13.72-74.92,1.41-90.6-28.87-6.73-59.97-14.9-89.33-7.12-61.65,20.38-14.75,23.91,18.31,28.69-2.86,6.9-5.62,13.56-8.4,20.27-28.57-7.57-60.43-16.41-87.79-.38-10.15-1.73-20.52-11.45-29.76-17.08-3.81-2.51,1.93-3.81,1.39-7.01,47.27-143.49,264.07-127.22,291.16,21.99Z"/>
+ <path fill="#2c2660" d="M140.3,159.38c-6.38-4.09-25.93-2.09-21.17-12.35,2.7-4.03,2.07-15.57,8.64-13.48,23.25,4.61,17.96,5.65,12.53,25.84Z"/>
+ <path fill="#ef453c" d="M235.79,132.05c-23.36-4.91-17.4.39-10.68-21.25,2.26-5.81,15.78-2.84,18.28.62-3.07,5.62-1.37,19.66-7.61,20.63Z"/>
+ <path fill="#2c2660" d="M195.9,174.31c13.85-4.72,8.66,25.42-2.88,19.76-4.53-6.39-2.23-15.13,2.88-19.76Z"/>
+ <path fill="#ef453c" d="M363.57,169.58c-74.78,5.89-73.62-9.36.02-.56,0,.19-.01.37-.02.56Z"/>
+ <path fill="#ef453c" d="M310.6,156.75c3.06-11.8,41.14,1.79,51.97,2.72-17.35-1.37-34.2-1.64-51.97-2.72Z"/>
+ <path fill="#ef453c" d="M362.57,149.68c-66.25-7.2-62.82-21.21.15-.6-.05.2-.1.4-.15.6Z"/>
+ <path fill="#ef453c" d="M362.37,138.24c-62.63-13.07-58.31-24.65.31-.71-.1.24-.21.47-.31.71Z"/>
+ <path fill="#ef453c" d="M320.79,111.9c1.24-9.23,26.56,8.35,32.54,10.67-10.26-1.21-22.3-7-32.54-10.67Z"/>
+ </svg>
+ <div>
+ <h1>${COMPANY.name}</h1>
+ <div class="header-detail">${COMPANY.regdOffice}</div>
+ <div class="header-detail" style="font-weight:700;">GSTIN: 01AAOCP0974B1ZQ</div>
+ <div class="header-phones"><span>Delhi: 9555251516</span><span>Srinagar: 9906661400</span></div>
+ </div>
+ </div>
+ </div>
+ <div class="header-right">
+ <div class="lr-box">
+ <span class="lr-label">LR No</span>
+ <span class="lr-value">${booking.booking_no}</span>
+ <span class="lr-label" style="margin-top:4px;">Date</span>
+ <span class="lr-value">${booking.lr_date ? new Date(booking.lr_date).toLocaleDateString('en-IN') : '-'}</span>
+ </div>
+ <div class="barcode-wrap">${barcodeSvg}</div>
+ </div>
+ </div>
 
-      <!-- Route Bar -->
-      <div class="route-bar">
-        <span><strong>From:</strong> ${booking.from_location || '-'}</span>
-        <span class="sep">→</span>
-        <span><strong>To:</strong> ${booking.to_location || '-'}</span>
-      </div>
+ <!-- Route Bar -->
+ <div class="route-bar">
+ <span><strong>From:</strong> ${booking.from_location || '-'}</span>
+ <span class="sep">→</span>
+ <span><strong>To:</strong> ${booking.to_location || '-'}</span>
+ </div>
 
-      <!-- Parties -->
-      <table class="party-table">
-        <tr>
-          <td class="party-cell">
-            <div class="section-title">Consignor (Sender)</div>
-            <div class="party-name">${booking.consignor_name || '-'}</div>
-            <div class="party-info">${booking.consignor_address || ''}</div>
-            <div class="party-info">GST: ${booking.consignor_gstin || '-'} ${booking.consignor_contact ? `| ${booking.consignor_contact}` : ''}</div>
-          </td>
-          <td class="party-cell">
-            <div class="section-title">Consignee (Receiver)</div>
-            <div class="party-name">${booking.consignee_name || '-'}</div>
-            <div class="party-info">${booking.consignee_address || ''}</div>
-            <div class="party-info">GST: ${booking.consignee_gstin || '-'} ${booking.consignee_contact ? `| ${booking.consignee_contact}` : ''}</div>
-            ${booking.consignee_delivery_address ? `<div class="party-delivery"><strong>Delivery:</strong> ${booking.consignee_delivery_address}</div>` : ''}
-          </td>
-        </tr>
-      </table>
+ <!-- Parties -->
+ <table class="party-table">
+ <tr>
+ <td class="party-cell">
+ <div class="section-title">Consignor (Sender)</div>
+ <div class="party-name">${booking.consignor_name || '-'}</div>
+ <div class="party-info">${booking.consignor_address || ''}</div>
+ <div class="party-info">GST: ${booking.consignor_gstin || '-'} ${booking.consignor_contact ? `| ${booking.consignor_contact}` : ''}</div>
+ </td>
+ <td class="party-cell">
+ <div class="section-title">Consignee (Receiver)</div>
+ <div class="party-name">${booking.consignee_name || '-'}</div>
+ <div class="party-info">${booking.consignee_address || ''}</div>
+ <div class="party-info">GST: ${booking.consignee_gstin || '-'} ${booking.consignee_contact ? `| ${booking.consignee_contact}` : ''}</div>
+ ${booking.consignee_delivery_address ? `<div class="party-delivery"><strong>Delivery:</strong> ${booking.consignee_delivery_address}</div>` : ''}
+ </td>
+ </tr>
+ </table>
 
-      <!-- Material -->
-      <table class="data-table">
-        <tr><th colspan="4">Material Details</th></tr>
-        <tr>
-          <td class="label-cell">No. of Nags</td>
-          <td class="val-cell">${booking.num_bags ?? '-'}</td>
-          <td class="label-cell">Type of Packing</td>
-          <td class="val-cell">${booking.type_of_packing || '-'}</td>
-        </tr>
-        <tr>
-          <td class="label-cell">Said to Contain</td>
-          <td class="val-cell" colspan="3">${booking.said_to_contain || '-'}</td>
-        </tr>
-        <tr>
-          <td class="label-cell">Actual Weight</td>
-          <td class="val-cell">${booking.actual_weight ? booking.actual_weight + ' kg' : '-'}</td>
-          <td class="label-cell">Charged Weight</td>
-          <td class="val-cell">${booking.charged_weight ? booking.charged_weight + ' kg' : '-'}</td>
-        </tr>
-        <tr>
-          <td class="label-cell">Private Marka</td>
-          <td class="val-cell">${booking.private_marka || '-'}</td>
-          <td class="label-cell"></td>
-          <td class="val-cell"></td>
-        </tr>
-      </table>
+ <!-- Material -->
+ <table class="data-table">
+ <tr><th colspan="4">Material Details</th></tr>
+ <tr>
+ <td class="label-cell">No. of Nags</td>
+ <td class="val-cell">${booking.num_bags ?? '-'}</td>
+ <td class="label-cell">Type of Packing</td>
+ <td class="val-cell">${booking.type_of_packing || '-'}</td>
+ </tr>
+ <tr>
+ <td class="label-cell">Said to Contain</td>
+ <td class="val-cell" colspan="3">${booking.said_to_contain || '-'}</td>
+ </tr>
+ <tr>
+ <td class="label-cell">Actual Weight</td>
+ <td class="val-cell">${booking.actual_weight ? booking.actual_weight + ' kg' : '-'}</td>
+ <td class="label-cell">Charged Weight</td>
+ <td class="val-cell">${booking.charged_weight ? booking.charged_weight + ' kg' : '-'}</td>
+ </tr>
+ <tr>
+ <td class="label-cell">Private Marka</td>
+ <td class="val-cell">${booking.private_marka || '-'}</td>
+ <td class="label-cell"></td>
+ <td class="val-cell"></td>
+ </tr>
+ </table>
 
-      <!-- Invoice -->
-      <table class="data-table">
-        <tr><th colspan="4">Material Invoice</th></tr>
-        <tr>
-          <td class="label-cell">Invoice No</td>
-          <td class="val-cell">${booking.material_invoice_no || '-'}</td>
-          <td class="label-cell">Invoice Date</td>
-          <td class="val-cell">${booking.material_invoice_date ? new Date(booking.material_invoice_date).toLocaleDateString('en-IN') : '-'}</td>
-        </tr>
-        <tr>
-          <td class="label-cell">Invoice Amount</td>
-          <td class="val-cell" colspan="3">₹ ${(booking.material_invoice_amt ?? 0).toLocaleString('en-IN')}</td>
-        </tr>
-      </table>
+ <!-- Invoice -->
+ <table class="data-table">
+ <tr><th colspan="4">Material Invoice</th></tr>
+ <tr>
+ <td class="label-cell">Invoice No</td>
+ <td class="val-cell">${booking.material_invoice_no || '-'}</td>
+ <td class="label-cell">Invoice Date</td>
+ <td class="val-cell">${booking.material_invoice_date ? new Date(booking.material_invoice_date).toLocaleDateString('en-IN') : '-'}</td>
+ </tr>
+ <tr>
+ <td class="label-cell">Invoice Amount</td>
+ <td class="val-cell" colspan="3">₹ ${(booking.material_invoice_amt ?? 0).toLocaleString('en-IN')}</td>
+ </tr>
+ </table>
 
-      <!-- Charges -->
-      <table class="data-table">
-        <tr><th colspan="2">${booking.paid ? 'Charges Paid' : 'Charges (To Pay)'}</th></tr>
-        <tr><td class="label-cell">Freight</td><td class="right">₹ ${(booking.freight ?? 0).toLocaleString('en-IN')}</td></tr>
-        <tr><td class="label-cell">E-Way Bill Charges</td><td class="right">₹ ${(booking.eway_bill_charges ?? 0).toLocaleString('en-IN')}</td></tr>
-        <tr><td class="label-cell">Previous Freight</td><td class="right">₹ ${(booking.previous_freight ?? 0).toLocaleString('en-IN')}</td></tr>
-        <tr><td class="label-cell">Door Delivery</td><td class="right">₹ ${(booking.door_delivery ?? 0).toLocaleString('en-IN')}</td></tr>
-        <tr><td class="label-cell">Consignment Charges</td><td class="right">₹ ${(booking.consignment_charges ?? 0).toLocaleString('en-IN')}</td></tr>
-        <tr><td class="label-cell">Other Charges</td><td class="right">₹ ${(booking.other_charges ?? 0).toLocaleString('en-IN')}</td></tr>
-        <tr class="total-row"><td class="label-cell">Total Charges</td><td class="right">₹ ${(booking.total_charges ?? 0).toLocaleString('en-IN')}</td></tr>
-        <tr><td class="label-cell">Discount</td><td class="right">₹ ${(booking.discount ?? 0).toLocaleString('en-IN')}</td></tr>
-        <tr class="grand-total-row"><td class="label-cell">Grand Total</td><td class="right">₹ ${(booking.grand_total ?? 0).toLocaleString('en-IN')}</td></tr>
-        <tr><td class="label-cell" style="text-transform:none;">Amount in Words</td><td class="val-cell" style="font-size:9px;font-style:italic;text-transform:capitalize;">Rupees ${numToWords(booking.grand_total ?? 0)} Only</td></tr>
-      </table>
+ <!-- Charges -->
+ <table class="data-table">
+ <tr><th colspan="2">${booking.paid ? 'Charges Paid' : 'Charges (To Pay)'}</th></tr>
+ <tr><td class="label-cell">Freight</td><td class="right">₹ ${(booking.freight ?? 0).toLocaleString('en-IN')}</td></tr>
+ <tr><td class="label-cell">E-Way Bill Charges</td><td class="right">₹ ${(booking.eway_bill_charges ?? 0).toLocaleString('en-IN')}</td></tr>
+ <tr><td class="label-cell">Previous Freight</td><td class="right">₹ ${(booking.previous_freight ?? 0).toLocaleString('en-IN')}</td></tr>
+ <tr><td class="label-cell">Door Delivery</td><td class="right">₹ ${(booking.door_delivery ?? 0).toLocaleString('en-IN')}</td></tr>
+ <tr><td class="label-cell">Consignment Charges</td><td class="right">₹ ${(booking.consignment_charges ?? 0).toLocaleString('en-IN')}</td></tr>
+ <tr><td class="label-cell">Other Charges</td><td class="right">₹ ${(booking.other_charges ?? 0).toLocaleString('en-IN')}</td></tr>
+ <tr class="total-row"><td class="label-cell">Total Charges</td><td class="right">₹ ${(booking.total_charges ?? 0).toLocaleString('en-IN')}</td></tr>
+ <tr><td class="label-cell">Discount</td><td class="right">₹ ${(booking.discount ?? 0).toLocaleString('en-IN')}</td></tr>
+ <tr class="grand-total-row"><td class="label-cell">Grand Total</td><td class="right">₹ ${(booking.grand_total ?? 0).toLocaleString('en-IN')}</td></tr>
+ <tr><td class="label-cell" style="text-transform:none;">Amount in Words</td><td class="val-cell" style="font-size:9px;font-style:italic;text-transform:capitalize;">Rupees ${numToWords(booking.grand_total ?? 0)} Only</td></tr>
+ </table>
 
-      <!-- E-Way -->
-      <div class="eway-bar">
-        <span><strong>E-Way Bill:</strong> ${booking.eway_bill_no || '-'}</span>
-        <span><strong>Expiry:</strong> ${booking.eway_expiry_date ? new Date(booking.eway_expiry_date).toLocaleDateString('en-IN') : '-'}</span>
-      </div>
+ <!-- E-Way -->
+ <div class="eway-bar">
+ <span><strong>E-Way Bill:</strong> ${booking.eway_bill_no || '-'}</span>
+ <span><strong>Expiry:</strong> ${booking.eway_expiry_date ? new Date(booking.eway_expiry_date).toLocaleDateString('en-IN') : '-'}</span>
+ </div>
 
-      ${booking.notes ? `<div class="notes"><strong>Notes:</strong> ${booking.notes}</div>` : ''}
+ ${booking.notes ? `<div class="notes"><strong>Notes:</strong> ${booking.notes}</div>` : ''}
 
-      <!-- Bank Information -->
-      <div class="bank-info">
-        <div class="bank-title">BANK INFORMATION</div>
-        <div class="bank-row"><span class="bank-label">Account Name</span><span class="bank-val">Planet Transport Pvt Ltd.</span></div>
-        <div class="bank-row"><span class="bank-label">Account Number</span><span class="bank-val">12345678901</span></div>
-        <div class="bank-row"><span class="bank-label">IFSC Code</span><span class="bank-val">SBIN0012345</span></div>
-        <div class="bank-row"><span class="bank-label">Branch</span><span class="bank-val">Tengpora, Srinagar</span></div>
-      </div>
+ <!-- Bank Information -->
+ <div class="bank-info">
+ <div class="bank-title">BANK INFORMATION</div>
+ <div class="bank-row"><span class="bank-label">Account Name</span><span class="bank-val">Planet Transport Pvt Ltd.</span></div>
+ <div class="bank-row"><span class="bank-label">Account Number</span><span class="bank-val">12345678901</span></div>
+ <div class="bank-row"><span class="bank-label">IFSC Code</span><span class="bank-val">SBIN0012345</span></div>
+ <div class="bank-row"><span class="bank-label">Branch</span><span class="bank-val">Tengpora, Srinagar</span></div>
+ </div>
 
-      <!-- Terms -->
-      <div class="terms">
-        <div class="terms-title">Terms &amp; Conditions</div>
-        <ol class="terms-list">
-          <li>No Responsibility For Any Kind Of Leakage, Breakage Or Damage.</li>
-          <li>All Disputes To Delhi Jurisdiction Only.</li>
-          <li>Delivery Will Be Made Upon The Presentation Of The Original Receipt.</li>
-        </ol>
-      </div>
+ <!-- Terms -->
+ <div class="terms">
+ <div class="terms-title">Terms &amp; Conditions</div>
+ <ol class="terms-list">
+ <li>No Responsibility For Any Kind Of Leakage, Breakage Or Damage.</li>
+ <li>All Disputes To Delhi Jurisdiction Only.</li>
+ <li>Delivery Will Be Made Upon The Presentation Of The Original Receipt.</li>
+ </ol>
+ </div>
 
 
-    </div>
-      ${copyLabel !== 'Driver Copy' ? `
-      <!-- Signatures -->
-      <div class="signatures">
-        <div class="sig-box"><span>Consignor Signature</span></div>
-        <div class="sig-box"><span>Driver Signature</span></div>
-        <div class="sig-box"><span>Authorised Signatory</span></div>
-      </div>` : ''}
+ </div>
+ ${copyLabel !== 'Driver Copy' ? `
+ <!-- Signatures -->
+ <div class="signatures">
+ <div class="sig-box"><span>Consignor Signature</span></div>
+ <div class="sig-box"><span>Driver Signature</span></div>
+ <div class="sig-box"><span>Authorised Signatory</span></div>
+ </div>` : ''}
 
-  `;
+ `;
 }
 
 function fullPrintHTML(booking: Booking, barcodeSvg: string): string {
-  const copies = COPY_LABELS.map((label, i) => {
-    const pgBreak = i < COPY_LABELS.length - 1 ? 'page-break-after: always;' : '';
-    return `<div style="${pgBreak}">${LRRPrintHTML(booking, label, barcodeSvg)}</div>`;
-  }).join('');
+ const copies = COPY_LABELS.map((label, i) => {
+ const pgBreak = i < COPY_LABELS.length - 1 ? 'page-break-after: always;' : '';
+ return `<div style="${pgBreak}">${LRRPrintHTML(booking, label, barcodeSvg)}</div>`;
+ }).join('');
 
-  return `<!DOCTYPE html>
+ return `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 <title>LRR - ${booking.booking_no}</title>
 <style>
-  @page { size: A4; margin: 6mm; }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 13px; color: #1a1a1a; }
-  .lr-page { padding: 8px 0; position: relative; }
-  .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 340px; opacity: 0.08; pointer-events: none; z-index: 0; }
-  .copy-badge {
-    position: absolute; top: 0; right: 0;
-    background: #dc2626; color: #fff;
-    padding: 3px 12px; font-size: 10px; font-weight: 600;
-    letter-spacing: 0.5px; border-radius: 0 0 0 4px;
-  }
+ @page { size: A4; margin: 6mm; }
+ * { box-sizing: border-box; margin: 0; padding: 0; }
+ body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 13px; color: #1a1a1a; }
+ .lr-page { padding: 8px 0; position: relative; }
+ .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 340px; opacity: 0.08; pointer-events: none; z-index: 0; }
+ .copy-badge {
+ position: absolute; top: 0; right: 0;
+ background: #dc2626; color: #fff;
+ padding: 3px 12px; font-size: 10px; font-weight: 600;
+ letter-spacing: 0.5px; border-radius: 0 0 0 4px;
+ }
 
-  /* Header */
-  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 2px solid #dc2626; }
-  .brand { display: flex; align-items: center; gap: 10px; }
-  .logo { width: 120px; height: auto; flex-shrink: 0; }
-  .header-left h1 { font-size: 24px; color: #dc2626; margin: 0; font-weight: 800; letter-spacing: -0.3px; line-height: 1.1; }
-  .header-detail { font-size: 12px; color: #666; }
-  .header-phones { display: flex; gap: 14px; margin-top: 2px; font-size: 12px; color: #dc2626; font-weight: 600; }
-  .lr-box { background: #fef2f2; border: 1.5px solid #dc2626; border-radius: 6px; padding: 5px 12px; display: flex; flex-direction: column; min-width: 150px; }
-  .lr-label { font-size: 10px; text-transform: uppercase; color: #dc2626; font-weight: 600; letter-spacing: 0.3px; }
-  .lr-value { font-size: 15px; font-weight: 700; color: #1a1a1a; font-family: 'Courier New', monospace; }
-  .barcode-wrap { margin-top: 6px; text-align: center; }
-  .barcode-wrap svg { max-width: 220px; height: auto; }
+ /* Header */
+ .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 2px solid #dc2626; }
+ .brand { display: flex; align-items: center; gap: 10px; }
+ .logo { width: 120px; height: auto; flex-shrink: 0; }
+ .header-left h1 { font-size: 24px; color: #dc2626; margin: 0; font-weight: 800; letter-spacing: -0.3px; line-height: 1.1; }
+ .header-detail { font-size: 12px; color: #666; }
+ .header-phones { display: flex; gap: 14px; margin-top: 2px; font-size: 12px; color: #dc2626; font-weight: 600; }
+ .lr-box { background: #fef2f2; border: 1.5px solid #dc2626; border-radius: 6px; padding: 5px 12px; display: flex; flex-direction: column; min-width: 150px; }
+ .lr-label { font-size: 10px; text-transform: uppercase; color: #dc2626; font-weight: 600; letter-spacing: 0.3px; }
+ .lr-value { font-size: 15px; font-weight: 700; color: #1a1a1a; font-family: 'Courier New', monospace; }
+ .barcode-wrap { margin-top: 6px; text-align: center; }
+ .barcode-wrap svg { max-width: 220px; height: auto; }
 
-  /* Route Bar */
-  .route-bar { background: #fef2f2; border: 1.5px solid #fca5a5; border-radius: 4px; padding: 4px 10px; margin-bottom: 8px; font-size: 12px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
-  .route-bar .sep { color: #dc2626; font-weight: bold; margin: 0 4px; }
+ /* Route Bar */
+ .route-bar { background: #fef2f2; border: 1.5px solid #fca5a5; border-radius: 4px; padding: 4px 10px; margin-bottom: 8px; font-size: 12px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+ .route-bar .sep { color: #dc2626; font-weight: bold; margin: 0 4px; }
 
-  /* Section Titles */
-  .section-title { background: #dc2626; color: #fff; padding: 3px 8px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px; border-radius: 3px; }
-  .party-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
-  .party-table td { border: 1.5px solid #e5e7eb; padding: 6px 8px; vertical-align: top; width: 50%; }
-  .party-name { font-size: 14px; font-weight: 700; margin-bottom: 3px; color: #1a1a1a; }
-  .party-info { font-size: 12px; color: #555; line-height: 1.5; }
-  .party-delivery { margin-top: 3px; padding-top: 3px; border-top: 1px dashed #ddd; font-size: 12px; color: #555; }
+ /* Section Titles */
+ .section-title { background: #dc2626; color: #fff; padding: 3px 8px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px; border-radius: 3px; }
+ .party-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+ .party-table td { border: 1.5px solid #e5e7eb; padding: 6px 8px; vertical-align: top; width: 50%; }
+ .party-name { font-size: 14px; font-weight: 700; margin-bottom: 3px; color: #1a1a1a; }
+ .party-info { font-size: 12px; color: #555; line-height: 1.5; }
+ .party-delivery { margin-top: 3px; padding-top: 3px; border-top: 1px dashed #ddd; font-size: 12px; color: #555; }
 
-  /* Data Tables */
-  .data-table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
-  .data-table td, .data-table th { border: 1.2px solid #e5e7eb; padding: 4px 8px; }
-  .data-table th { background: #dc2626; color: #fff; font-size: 12px; font-weight: 600; text-align: center; text-transform: uppercase; letter-spacing: 0.3px; padding: 4px; }
-  .label-cell { background: #fafafa; font-weight: 600; font-size: 12px; color: #444; width: 22%; }
-  .val-cell { font-size: 13px; color: #1a1a1a; }
-  .right { text-align: right; font-size: 13px; font-family: 'Courier New', monospace; }
+ /* Data Tables */
+ .data-table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+ .data-table td, .data-table th { border: 1.2px solid #e5e7eb; padding: 4px 8px; }
+ .data-table th { background: #dc2626; color: #fff; font-size: 12px; font-weight: 600; text-align: center; text-transform: uppercase; letter-spacing: 0.3px; padding: 4px; }
+ .label-cell { background: #fafafa; font-weight: 600; font-size: 12px; color: #444; width: 22%; }
+ .val-cell { font-size: 13px; color: #1a1a1a; }
+ .right { text-align: right; font-size: 13px; font-family: 'Courier New', monospace; }
 
-  /* Totals */
-  .total-row td { border-top: 2px solid #dc2626; background: #fef2f2; font-weight: 700; }
-  .grand-total-row td { border-top: 2px double #dc2626; background: #fef2f2; font-size: 15px; font-weight: 800; color: #dc2626; }
+ /* Totals */
+ .total-row td { border-top: 2px solid #dc2626; background: #fef2f2; font-weight: 700; }
+ .grand-total-row td { border-top: 2px double #dc2626; background: #fef2f2; font-size: 15px; font-weight: 800; color: #dc2626; }
 
-  /* E-Way Bar */
-  .eway-bar { border: 1.2px solid #e5e7eb; border-radius: 4px; padding: 4px 10px; margin-bottom: 6px; font-size: 12px; display: flex; gap: 16px; flex-wrap: wrap; background: #fafafa; }
+ /* E-Way Bar */
+ .eway-bar { border: 1.2px solid #e5e7eb; border-radius: 4px; padding: 4px 10px; margin-bottom: 6px; font-size: 12px; display: flex; gap: 16px; flex-wrap: wrap; background: #fafafa; }
 
-  /* Notes */
-  .notes { border: 1.2px solid #e5e7eb; border-radius: 4px; padding: 4px 10px; margin-bottom: 6px; font-size: 12px; background: #fafafa; }
+ /* Notes */
+ .notes { border: 1.2px solid #e5e7eb; border-radius: 4px; padding: 4px 10px; margin-bottom: 6px; font-size: 12px; background: #fafafa; }
 
-  /* Bank Information */
-  .bank-info { margin-top: 6px; margin-bottom: 6px; }
-  .bank-title { font-size: 12px; font-weight: 700; color: #dc2626; letter-spacing: 0.3px; margin-bottom: 2px; }
-  .bank-row { font-size: 12px; color: #444; line-height: 1.5; }
-  .bank-label { font-weight: 600; }
-  .bank-val { margin-left: 4px; color: #1a1a1a; }
+ /* Bank Information */
+ .bank-info { margin-top: 6px; margin-bottom: 6px; }
+ .bank-title { font-size: 12px; font-weight: 700; color: #dc2626; letter-spacing: 0.3px; margin-bottom: 2px; }
+ .bank-row { font-size: 12px; color: #444; line-height: 1.5; }
+ .bank-label { font-weight: 600; }
+ .bank-val { margin-left: 4px; color: #1a1a1a; }
 
-  /* Terms */
-  .terms { margin-top: 4px; padding: 3px 6px; border: 1px solid #e5e7eb; border-radius: 3px; background: #fafafa; }
-  .terms-title { font-size: 9px; font-weight: 700; text-transform: uppercase; color: #dc2626; margin-bottom: 2px; letter-spacing: 0.2px; }
-  .terms-list { margin: 0; padding-left: 12px; font-size: 8px; color: #555; line-height: 1.4; }
-  .terms-list li { margin-bottom: 0; }
+ /* Terms */
+ .terms { margin-top: 4px; padding: 3px 6px; border: 1px solid #e5e7eb; border-radius: 3px; background: #fafafa; }
+ .terms-title { font-size: 9px; font-weight: 700; text-transform: uppercase; color: #dc2626; margin-bottom: 2px; letter-spacing: 0.2px; }
+ .terms-list { margin: 0; padding-left: 12px; font-size: 8px; color: #555; line-height: 1.4; }
+ .terms-list li { margin-bottom: 0; }
 
-  /* Signatures */
-  .signatures { display: flex; justify-content: space-between; margin-top: 14px; gap: 14px; }
-  .sig-box { flex: 1; text-align: center; }
-  .sig-box span { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.3px; }
+ /* Signatures */
+ .signatures { display: flex; justify-content: space-between; margin-top: 14px; gap: 14px; }
+ .sig-box { flex: 1; text-align: center; }
+ .sig-box span { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.3px; }
 
-  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+ @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
 </style>
 </head>
 <body>
@@ -301,11 +301,11 @@ ${copies}
 }
 
 export function printLRR(booking: Booking) {
-  const win = window.open('', '_blank');
-  if (!win) { alert('Please allow popups for printing.'); return; }
-  const barcodeSvg = generateBarcodeSVG(booking.booking_no);
-  win.document.write(fullPrintHTML(booking, barcodeSvg));
-  win.document.close();
-  win.focus();
-  setTimeout(() => win.print(), 500);
+ const win = window.open('', '_blank');
+ if (!win) { alert('Please allow popups for printing.'); return; }
+ const barcodeSvg = generateBarcodeSVG(booking.booking_no);
+ win.document.write(fullPrintHTML(booking, barcodeSvg));
+ win.document.close();
+ win.focus();
+ setTimeout(() => win.print(), 500);
 }

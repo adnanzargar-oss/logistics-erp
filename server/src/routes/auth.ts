@@ -17,7 +17,24 @@ router.post('/login', (req: Request, res: Response) => {
     res.status(401).json({ error: 'Invalid credentials' });
     return;
   }
-  const allowedModules = JSON.parse(user.allowed_modules || '[]');
+  let allowedModules = JSON.parse(user.allowed_modules || '{}');
+  // Old array format
+  if (Array.isArray(allowedModules)) {
+    const obj: Record<string, { tabs: string[]; actions: string[] }> = {};
+    for (const mod of allowedModules) obj[mod] = { tabs: ['*'], actions: ['create', 'edit', 'delete'] };
+    allowedModules = obj;
+  }
+  // Old object format (tabs-only)
+  else if (typeof allowedModules === 'object' && allowedModules !== null) {
+    const firstKey = Object.keys(allowedModules)[0];
+    if (firstKey && Array.isArray(allowedModules[firstKey])) {
+      const obj: Record<string, { tabs: string[]; actions: string[] }> = {};
+      for (const [mod, subs] of Object.entries(allowedModules)) {
+        obj[mod] = { tabs: subs as string[], actions: ['create', 'edit', 'delete'] };
+      }
+      allowedModules = obj;
+    }
+  }
   const token = generateToken({
     id: user.id,
     username: user.username,
@@ -98,6 +115,45 @@ router.delete('/users/:id', authenticate, requireSuperAdmin, (req: Request, res:
   }
   db.prepare('DELETE FROM users WHERE id = ?').run(id);
   res.json({ success: true });
+});
+
+// Update own profile
+router.put('/profile', authenticate, (req: Request, res: Response) => {
+  const user = (req as any).user;
+  const { username, current_password, new_password } = req.body;
+  const existing = db.prepare('SELECT * FROM users WHERE id = ?').get(user.id) as any;
+  if (!existing) {
+    res.status(404).json({ error: 'User not found' });
+    return;
+  }
+  if (new_password && !bcrypt.compareSync(current_password || '', existing.password)) {
+    res.status(400).json({ error: 'Current password is incorrect' });
+    return;
+  }
+  if (username && username !== existing.username) {
+    const taken = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
+    if (taken) {
+      res.status(409).json({ error: 'Username already taken' });
+      return;
+    }
+  }
+  const updates: string[] = [];
+  const values: any[] = [];
+  if (username !== undefined && username !== existing.username) {
+    updates.push('username = ?');
+    values.push(username);
+  }
+  if (new_password) {
+    updates.push('password = ?');
+    values.push(bcrypt.hashSync(new_password, 10));
+  }
+  if (updates.length > 0) {
+    values.push(user.id);
+    db.prepare(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`).run(...values);
+  }
+  const updated = db.prepare('SELECT id, username, role, allowed_modules FROM users WHERE id = ?').get(user.id) as any;
+  const allowedModules = JSON.parse(updated.allowed_modules || '[]');
+  res.json({ id: updated.id, username: updated.username, role: updated.role, allowed_modules: allowedModules });
 });
 
 export default router;

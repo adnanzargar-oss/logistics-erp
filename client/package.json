@@ -9,6 +9,7 @@
     "deploy": "vite build && npx gh-pages -d dist"
   },
   "dependencies": {
+    "html5-qrcode": "^2.3.8",
     "jsbarcode": "^3.12.3",
     "lucide-react": "^0.468.0",
     "react": "^19.0.0",

@@ -87,12 +87,19 @@ export const api = {
     create: (data: any) => request<any>('/loadings', { method: 'POST', body: JSON.stringify(data) }),
     delete: (id: number) => request<any>(`/loadings/${id}`, { method: 'DELETE' }),
     search: (q: string) => request<any[]>(`/loadings/search?q=${encodeURIComponent(q)}`),
+
   },
   warehouses: {
     list: () => request<any[]>('/warehouses'),
     create: (data: any) => request<any>('/warehouses', { method: 'POST', body: JSON.stringify(data) }),
     update: (id: number, data: any) => request<any>(`/warehouses/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     delete: (id: number) => request<any>(`/warehouses/${id}`, { method: 'DELETE' }),
+  },
+  cameras: {
+    list: (whId: number) => request<any[]>(`/warehouses/${whId}/cameras`),
+    create: (whId: number, data: any) => request<any>(`/warehouses/${whId}/cameras`, { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: number, data: any) => request<any>(`/warehouses/cameras/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    delete: (id: number) => request<any>(`/warehouses/cameras/${id}`, { method: 'DELETE' }),
   },
   deliveries: {
     list: () => request<any[]>('/deliveries'),

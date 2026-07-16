@@ -1,3 +1,11 @@
+export interface WarehouseCamera {
+  id?: number;
+  warehouse_id: number;
+  name: string;
+  url: string;
+  sort_order?: number;
+}
+
 export interface Vehicle {
   id?: number;
   reg_number: string;
@@ -57,6 +65,7 @@ export interface Warehouse {
   phone?: string;
   email?: string;
   status?: string;
+  camera_url?: string;
   total_bookings?: number;
   pickup_bookings?: number;
   delivery_bookings?: number;
@@ -149,6 +158,10 @@ export interface Loading {
   driver_name?: string;
   license_number?: string;
   item_count?: number;
+  from_warehouse_id?: number;
+  to_warehouse_id?: number;
+  from_warehouse_name?: string;
+  to_warehouse_name?: string;
   bookings?: Booking[];
 }
 
@@ -319,6 +332,7 @@ export interface Receiving {
   warehouse_name?: string;
   item_count?: number;
   bookings?: ReceivingItem[];
+  created_at?: string;
 }
 
 export interface DashboardData {
@@ -329,6 +343,9 @@ export interface DashboardData {
   payments: { total_payments: number; total_amount: number };
   fuel: { total_entries: number; total_liters: number; total_cost: number };
   monthlyBookings: { month: string; count: number }[];
+  monthlyLoadings: { month: string; count: number }[];
+  monthlyReceivings: { month: string; count: number }[];
+  monthlyDeliveries: { month: string; count: number }[];
   recentBookings: { id: number; booking_no: string; consignor_name: string; consignee_name: string; grand_total: number; status: string; created_at: string }[];
   loadingStats: { total: number; in_transit: number; received: number };
   customerCount: number;

@@ -64,6 +64,14 @@ db.exec(`
     created_at TEXT DEFAULT (datetime('now'))
   );
 
+  CREATE TABLE IF NOT EXISTS warehouse_cameras (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    warehouse_id INTEGER NOT NULL REFERENCES warehouses(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    url TEXT NOT NULL,
+    sort_order INTEGER DEFAULT 0
+  );
+
   CREATE TABLE IF NOT EXISTS warehouses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     code TEXT UNIQUE,
@@ -250,6 +258,12 @@ db.exec(`
   );
 `);
 
+// Migration: add warehouse columns to loadings
+try { db.exec("ALTER TABLE loadings ADD COLUMN from_warehouse_id INTEGER REFERENCES warehouses(id)"); } catch {}
+try { db.exec("ALTER TABLE loadings ADD COLUMN to_warehouse_id INTEGER REFERENCES warehouses(id)"); } catch {}
+
+
+
 // Migration: add loaded/delivered/received status to bookings
 try { db.exec("ALTER TABLE bookings ADD COLUMN loaded INTEGER DEFAULT 0"); } catch {}
 try { db.exec("ALTER TABLE bookings ADD COLUMN delivered INTEGER DEFAULT 0"); } catch {}
@@ -265,9 +279,14 @@ try { db.exec("ALTER TABLE invoices ADD COLUMN paid_by TEXT DEFAULT NULL"); } ca
 
 // Migration: add out_for_delivery to bookings
 try { db.exec("ALTER TABLE bookings ADD COLUMN out_for_delivery INTEGER DEFAULT 0"); } catch {}
+try { db.exec("ALTER TABLE delivery_items ADD COLUMN pod_photo TEXT"); } catch {}
+try { db.exec("ALTER TABLE delivery_items ADD COLUMN delivered_at TEXT"); } catch {}
 
 // Migration: add code to warehouses
 try { db.exec("ALTER TABLE warehouses ADD COLUMN code TEXT"); } catch {}
+
+// Migration: add camera_url to warehouses
+try { db.exec("ALTER TABLE warehouses ADD COLUMN camera_url TEXT"); } catch {}
 
 // Migration: add expense detail columns
 const expenseMigrations = [
@@ -404,5 +423,32 @@ export function nextCustomerNo(): string {
   }
   return `CUST-${String(seq).padStart(3, '0')}-${year}`;
 }
+
+// Migration: convert allowed_modules to ModulePermissions format
+try {
+  const rows = db.prepare('SELECT id, allowed_modules FROM users').all() as any[];
+  for (const row of rows) {
+    const val = JSON.parse(row.allowed_modules || '{}');
+    // Old array format: ["bookings", "deliveries"]
+    if (Array.isArray(val)) {
+      const obj: Record<string, { tabs: string[]; actions: string[] }> = {};
+      for (const mod of val) {
+        obj[mod] = { tabs: ['*'], actions: ['create', 'edit', 'delete'] };
+      }
+      db.prepare('UPDATE users SET allowed_modules = ? WHERE id = ?').run(JSON.stringify(obj), row.id);
+    }
+    // Old object format: {"bookings": ["today", "history"]}
+    else if (typeof val === 'object' && val !== null) {
+      const firstKey = Object.keys(val)[0];
+      if (firstKey && Array.isArray(val[firstKey])) {
+        const obj: Record<string, { tabs: string[]; actions: string[] }> = {};
+        for (const [mod, subs] of Object.entries(val)) {
+          obj[mod] = { tabs: subs as string[], actions: ['create', 'edit', 'delete'] };
+        }
+        db.prepare('UPDATE users SET allowed_modules = ? WHERE id = ?').run(JSON.stringify(obj), row.id);
+      }
+    }
+  }
+} catch {}
 
 export default db;

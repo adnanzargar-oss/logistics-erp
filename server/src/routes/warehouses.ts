@@ -31,15 +31,15 @@ warehousesRouter.get('/', (_req, res) => {
 });
 
 warehousesRouter.post('/', (req, res) => {
-  const { code, name, address, city, contact_person, phone, email } = req.body;
+  const { code, name, address, city, contact_person, phone, email, camera_url } = req.body;
   try {
     if (code) {
       const exists = db.prepare('SELECT id FROM warehouses WHERE code = ?').get(code);
       if (exists) return res.status(400).json({ error: 'Warehouse code already exists' });
     }
     const result = db.prepare(
-      'INSERT INTO warehouses (code, name, address, city, contact_person, phone, email) VALUES (?,?,?,?,?,?,?)'
-    ).run(code || null, name, address, city, contact_person, phone, email);
+      'INSERT INTO warehouses (code, name, address, city, contact_person, phone, email, camera_url) VALUES (?,?,?,?,?,?,?,?)'
+    ).run(code || null, name, address, city, contact_person, phone, email, camera_url || null);
     res.status(201).json({ id: result.lastInsertRowid, ...req.body });
   } catch (err) {
     res.status(400).json({ error: (err as Error).message });
@@ -47,15 +47,15 @@ warehousesRouter.post('/', (req, res) => {
 });
 
 warehousesRouter.put('/:id', (req, res) => {
-  const { code, name, address, city, contact_person, phone, email, status } = req.body;
+  const { code, name, address, city, contact_person, phone, email, status, camera_url } = req.body;
   try {
     if (code) {
       const exists = db.prepare('SELECT id FROM warehouses WHERE code = ? AND id != ?').get(code, req.params.id);
       if (exists) return res.status(400).json({ error: 'Warehouse code already exists' });
     }
     db.prepare(
-      'UPDATE warehouses SET code=?, name=?, address=?, city=?, contact_person=?, phone=?, email=?, status=? WHERE id=?'
-    ).run(code || null, name, address, city, contact_person, phone, email, status ?? 'Active', req.params.id);
+      'UPDATE warehouses SET code=?, name=?, address=?, city=?, contact_person=?, phone=?, email=?, status=?, camera_url=? WHERE id=?'
+    ).run(code || null, name, address, city, contact_person, phone, email, status ?? 'Active', camera_url || null, req.params.id);
     res.json({ success: true });
   } catch (err) {
     res.status(400).json({ error: (err as Error).message });

@@ -3,6 +3,51 @@ import db from '../database.js';
 
 export const dashboardRouter = Router();
 
+dashboardRouter.get('/activity', (_req, res) => {
+  try {
+    const bookings = db.prepare(`
+      SELECT 'booking' as type, id, booking_no as ref, consignor_name || ' → ' || consignee_name as description, status, created_at, lr_date as event_date
+      FROM bookings ORDER BY id DESC LIMIT 10
+    `).all();
+    const loadings = db.prepare(`
+      SELECT 'loading' as type, l.id as id, l.loading_no as ref, v.reg_number || ' loaded' as description, l.status, l.created_at, l.loading_date as event_date
+      FROM loadings l LEFT JOIN vehicles v ON v.id = l.vehicle_id ORDER BY l.id DESC LIMIT 10
+    `).all();
+    const receivings = db.prepare(`
+      SELECT 'receiving' as type, r.id, r.receiving_no as ref, w.name || ' received' as description, r.status, r.created_at, r.receiving_date as event_date
+      FROM receivings r LEFT JOIN warehouses w ON w.id = r.warehouse_id ORDER BY r.id DESC LIMIT 10
+    `).all();
+    const deliveries = db.prepare(`
+      SELECT 'delivery' as type, d.id, d.delivery_no as ref, dp.name || ' delivering' as description, d.status, d.created_at, d.delivery_date as event_date
+      FROM deliveries d LEFT JOIN delivery_persons dp ON dp.id = d.delivery_person_id ORDER BY d.id DESC LIMIT 10
+    `).all();
+    const invoices = db.prepare(`
+      SELECT 'invoice' as type, id, invoice_no as ref, 'Invoice created' as description, status, created_at, invoice_date as event_date
+      FROM invoices ORDER BY id DESC LIMIT 10
+    `).all();
+    const expenses = db.prepare(`
+      SELECT 'expense' as type, id, voucher_no as ref, expense_category || ' expense' as description, status, created_at, expense_date as event_date
+      FROM expenses ORDER BY id DESC LIMIT 10
+    `).all();
+    const payments = db.prepare(`
+      SELECT 'payment' as type, id, payment_no as ref, party_name || ' payment' as description, '' as status, created_at, payment_date as event_date
+      FROM payments ORDER BY id DESC LIMIT 10
+    `).all();
+
+    const all = [...bookings, ...loadings, ...receivings, ...deliveries, ...invoices, ...expenses, ...payments]
+      .sort((a: any, b: any) => {
+        const da = a.event_date || a.created_at;
+        const db_ = b.event_date || b.created_at;
+        return da > db_ ? -1 : da < db_ ? 1 : 0;
+      })
+      .slice(0, 30);
+
+    res.json(all);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
 dashboardRouter.get('/', (_req, res) => {
   try {
     const [bookingStats] = db.prepare(`
@@ -59,6 +104,24 @@ dashboardRouter.get('/', (_req, res) => {
       GROUP BY month ORDER BY month
     `).all();
 
+    const monthlyLoadings = db.prepare(`
+      SELECT strftime('%Y-%m', loading_date) as month, COUNT(*) as count
+      FROM loadings WHERE loading_date >= date('now', '-6 months')
+      GROUP BY month ORDER BY month
+    `).all();
+
+    const monthlyReceivings = db.prepare(`
+      SELECT strftime('%Y-%m', receiving_date) as month, COUNT(*) as count
+      FROM receivings WHERE receiving_date >= date('now', '-6 months')
+      GROUP BY month ORDER BY month
+    `).all();
+
+    const monthlyDeliveries = db.prepare(`
+      SELECT strftime('%Y-%m', delivery_date) as month, COUNT(*) as count
+      FROM deliveries WHERE delivery_date >= date('now', '-6 months')
+      GROUP BY month ORDER BY month
+    `).all();
+
     const recentBookings = db.prepare(`
       SELECT id, booking_no, consignor_name, consignee_name, grand_total, status, created_at
       FROM bookings ORDER BY id DESC LIMIT 8
@@ -96,6 +159,9 @@ dashboardRouter.get('/', (_req, res) => {
       payments: paymentStats,
       fuel: fuelStats,
       monthlyBookings,
+      monthlyLoadings,
+      monthlyReceivings,
+      monthlyDeliveries,
       recentBookings,
       loadingStats: loadingStats[0],
       customerCount: customerCount[0].total,

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import type { ModulePermissions } from './permissions';
 
 const BASE = import.meta.env.VITE_API_URL || '/api';
 
@@ -6,7 +7,7 @@ type User = {
   id: number;
   username: string;
   role: string;
-  allowed_modules: string[];
+  allowed_modules: ModulePermissions;
 };
 
 type AuthContextType = {

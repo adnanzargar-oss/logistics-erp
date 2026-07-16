@@ -16,3 +16,5 @@ export { receivingsRouter } from './receivings.js';
 export { deliveryPersonsRouter } from './deliveryPersons.js';
 export { default as authRouter } from './auth.js';
 export { trackingRouter } from './tracking.js';
+export { default as dataioRouter } from './dataio.js';
+export { camerasRouter } from './warehouseCameras.js';
