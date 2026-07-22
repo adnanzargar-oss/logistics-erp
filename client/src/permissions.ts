@@ -17,6 +17,7 @@ export const MODULES = [
   { id: 'expenses', label: 'Expenses' },
   { id: 'reports', label: 'Reports' },
   { id: 'dataio', label: 'Data Import/Export' },
+  { id: 'lr-search', label: 'LR Search' },
 ];
 
 export const SUBMODULES: Record<string, { id: string; label: string }[]> = {

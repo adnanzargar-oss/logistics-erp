@@ -25,6 +25,7 @@ import BarcodePrint from './components/BarcodePrint';
 import Calendar from './components/Calendar';
 import DataIO from './components/DataIO';
 import POD from './components/POD';
+import LRSearch from './components/LRSearch';
 
 function AppContent() {
   const { user, loading, logout } = useAuth();
@@ -99,7 +100,8 @@ function AppContent() {
   case 'bookings': return <Bookings key={`book-${detailKey}`} tabs={modulePerms('bookings')} actions={moduleActions('bookings')} />;
   case 'loadings': return <Loadings key={`load-${detailKey}`} tabs={modulePerms('loadings')} actions={moduleActions('loadings')} />;
    case 'deliveries': return <Deliveries key={`del-${detailKey}`} tabs={modulePerms('deliveries')} actions={moduleActions('deliveries')} />;
-  case 'pod': return <POD key={`pod-${detailKey}`} />;
+   case 'pod': return <POD key={`pod-${detailKey}`} />;
+   case 'lr-search': return <LRSearch key={`lr-${detailKey}`} />;
   default: return (
   <>{{
   fleet: <Fleet />,
@@ -166,12 +168,13 @@ function AppContent() {
   )}
   </div>
   </div>
-  <div className="flex-1 overflow-auto">
-  <div className="p-3 md:p-6 max-w-7xl mx-auto">
-  {renderPage()}
-  </div>
-  </div>
-  </main>
+   <div className="flex-1 overflow-auto">
+   <div className="p-3 md:p-6 max-w-7xl mx-auto">
+   {renderPage()}
+   </div>
+   </div>
+   <div className="text-center text-[10px] text-gray-400 py-1.5 border-t border-gray-100 bg-white shrink-0">Software Developed by Solomon Adnan &nbsp;|&nbsp; v1.0</div>
+   </main>
   {editProfileOpen && <EditProfile onClose={() => setEditProfileOpen(false)} />}
   </div>
   );

@@ -21,6 +21,7 @@ import {
   authRouter,
   trackingRouter,
   dataioRouter,
+  lrrSearchRouter,
 } from './routes/index.js';
 
 const app = express();
@@ -49,6 +50,7 @@ app.use('/api/delivery-persons', deliveryPersonsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/track', trackingRouter);
 app.use('/api/dataio', dataioRouter);
+app.use('/api/lrr-search', lrrSearchRouter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });

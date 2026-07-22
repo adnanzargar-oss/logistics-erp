@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Camera, Scan, CheckSquare, ClipboardCheck, Loader2, Barcode } from 'lucide-react';
 import Modal from './Modal';
 
@@ -13,12 +13,15 @@ export default function POD() {
   const [fileKeys, setFileKeys] = useState<Record<number, number>>({});
   const [scannerOpen, setScannerOpen] = useState(false);
   const scannerRef = useRef<any>(null);
+  const searchTimer = useRef<any>(null);
 
-  const search = async () => {
-    if (!podSearch.trim()) return;
+
+  const search = async (q?: string) => {
+    const term = q ?? podSearch;
+    if (!term.trim()) return;
     setLoading(true);
     setMsg('');
-    const r = await fetch(`/api/deliveries/pod/search?q=${encodeURIComponent(podSearch)}`).then(r => r.json());
+    const r = await fetch(`/api/deliveries/pod/search?q=${encodeURIComponent(term)}`).then(r => r.json());
     setPodResults(r);
     setLoading(false);
   };
@@ -100,7 +103,7 @@ export default function POD() {
             <label className="block text-xs font-medium text-gray-500 mb-1">Scan barcode or type Delivery/LR number</label>
             <div className="relative">
               <Scan size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input type="text" placeholder="e.g. DLV-... or PT-..." value={podSearch} onChange={(e) => setPodSearch(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} className="w-full border rounded-lg pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+              <input type="text" placeholder="e.g. DLV-... or PT-..." value={podSearch} onChange={(e) => { const v = e.target.value; setPodSearch(v); if (searchTimer.current) clearTimeout(searchTimer.current); if (v.trim()) { searchTimer.current = setTimeout(() => search(v), 300); } else { setPodResults([]); } }} className="w-full border rounded-lg pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
             </div>
           </div>
           <button onClick={startScanner} className="px-3 py-2 text-sm border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 font-medium flex items-center gap-1.5" title="Scan barcode"><Barcode size={15} /></button>
@@ -138,10 +141,15 @@ export default function POD() {
                     {hasPhoto && (
                       <img src={photoData} alt="POD" className="w-10 h-10 rounded-lg object-cover border border-gray-200 shrink-0" />
                     )}
-                    <label className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-colors ${hasPhoto ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
-                      <Camera size={14} />
-                      {hasPhoto ? 'Retake' : 'Capture'}
-                      <input key={fileKeys[b.id] || 0} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) capturePhoto(b.id, f); }} />
+                    <label className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-colors ${hasPhoto ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                      <Camera size={13} />
+                      Camera
+                      <input key={`cam-${fileKeys[b.id] || 0}`} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) capturePhoto(b.id, f); }} />
+                    </label>
+                    <label className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-colors ${hasPhoto ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                      <Camera size={13} />
+                      Upload
+                      <input key={`up-${fileKeys[b.id] || 0}`} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) capturePhoto(b.id, f); }} />
                     </label>
                     {hasPhoto && (
                       <>

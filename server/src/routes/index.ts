@@ -18,3 +18,4 @@ export { default as authRouter } from './auth.js';
 export { trackingRouter } from './tracking.js';
 export { default as dataioRouter } from './dataio.js';
 export { camerasRouter } from './warehouseCameras.js';
+export { lrrSearchRouter } from './lrr-search.js';

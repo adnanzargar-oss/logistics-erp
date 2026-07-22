@@ -2,7 +2,7 @@ import {
   LayoutDashboard, Truck, BookOpen,
   Fuel, Wrench, FileText, Banknote, Receipt, BarChart3,
   Building2, Warehouse, PackageCheck, Package, Barcode, CalendarDays,
-  ChevronLeft, ChevronRight, ArrowDownToLine, Menu, X, ClipboardCheck
+  ChevronLeft, ChevronRight, ArrowDownToLine, Menu, X, ClipboardCheck, Search
 } from 'lucide-react';
 import { useState } from 'react';
 import type { ModulePermissions } from '../permissions';
@@ -25,6 +25,7 @@ const menuItems = [
   { id: 'calendar', label: 'Calendar', icon: CalendarDays },
   { id: 'expenses', label: 'Expenses', icon: Receipt },
   { id: 'reports', label: 'Reports', icon: BarChart3 },
+  { id: 'lr-search', label: 'LR Search', icon: Search },
 ];
 
 export default function Sidebar({ current, onNavigate, mobileOpen, onMobileClose, allowedModules }: {
@@ -88,7 +89,7 @@ export default function Sidebar({ current, onNavigate, mobileOpen, onMobileClose
                 active
                   ? 'bg-gray-100 text-gray-900 font-medium'
                   : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-              }`}
+              } ${item.id === 'lr-search' ? 'opacity-50' : ''}`}
               title={collapsed ? item.label : undefined}
             >
               <Icon size={18} className="shrink-0" />

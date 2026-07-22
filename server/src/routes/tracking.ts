@@ -15,7 +15,7 @@ trackingRouter.get('/:booking_no', (req, res) => {
     LEFT JOIN drivers d ON b.driver_id = d.id
     LEFT JOIN warehouses pw ON b.pickup_warehouse_id = pw.id
     LEFT JOIN warehouses dw ON b.delivery_warehouse_id = dw.id
-    WHERE b.booking_no = ?
+    WHERE b.booking_no LIKE ?
   `).get(req.params.booking_no) as any;
 
   if (!booking) return res.status(404).json({ error: 'LRR not found' });
@@ -29,7 +29,8 @@ trackingRouter.get('/:booking_no', (req, res) => {
 
   const delivery = db.prepare(`
     SELECT d.delivery_no, d.delivery_date, d.status as delivery_status,
-           dp.name as delivery_person_name, dp.phone as delivery_person_phone
+           dp.name as delivery_person_name, dp.phone as delivery_person_phone,
+           di.pod_photo
     FROM deliveries d
     JOIN delivery_items di ON di.delivery_id = d.id
     LEFT JOIN delivery_persons dp ON dp.id = d.delivery_person_id
@@ -48,10 +49,10 @@ trackingRouter.get('/:booking_no', (req, res) => {
   const stages = [
     { label: 'Booked', date: booking.created_at, done: true, icon: 'clipboard' },
     { label: 'Loaded', date: booking.loaded ? (loading?.loading_date || null) : null, done: !!booking.loaded, icon: 'package', ref: loading?.loading_no || null },
-    { label: 'Received at Hub', date: booking.received ? (receiving?.receiving_date || null) : null, done: !!booking.received, icon: 'inbox', ref: receiving?.receiving_no || null },
+    { label: 'Received at Hub', date: booking.received ? (receiving?.receiving_date || null) : null, done: !!booking.received, icon: 'inbox', ref: receiving?.receiving_no || null, warehouse: receiving?.warehouse_name || null },
     { label: 'Out for Delivery', date: (booking.out_for_delivery || booking.delivered) ? (delivery?.delivery_date || null) : null, done: !!(booking.out_for_delivery || booking.delivered), icon: 'truck', ref: delivery?.delivery_no || null },
     { label: 'Delivered', date: booking.delivered ? (delivery?.delivery_date || null) : null, done: !!booking.delivered, icon: 'check' },
   ];
 
-  res.json({ booking, stages });
+  res.json({ booking, stages, pod_photo: delivery?.pod_photo || null });
 });
