@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Download, Upload, ArrowDownToLine, FileDown, FileUp, Database, Check, AlertCircle } from 'lucide-react';
 import Modal from './Modal';
+import { getHeaders } from '../api';
 
 interface EntityInfo {
   id: string;
@@ -16,7 +17,7 @@ export default function DataIO() {
   const [selEntity, setSelEntity] = useState('');
 
   const loadEntities = async () => {
-    const list = await (await fetch('/api/dataio/entities')).json();
+    const list = await (await fetch('/api/dataio/entities', { headers: getHeaders() })).json();
     setEntities(list);
     if (list.length > 0 && !selEntity) setSelEntity(list[0].id);
   };

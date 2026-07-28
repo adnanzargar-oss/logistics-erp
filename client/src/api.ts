@@ -7,6 +7,8 @@ function getHeaders(): Record<string, string> {
   return headers;
 }
 
+export { getHeaders };
+
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${url}`, {
     headers: getHeaders(),

@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import db from './database.js';
+import { authenticate } from './middleware/auth.js';
 import {
   bookingsRouter,
   vehiclesRouter,
@@ -30,6 +31,17 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
+// Public routes (no auth required)
+app.use('/api/auth', authRouter);
+app.use('/api/track', trackingRouter);
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok' });
+});
+
+// Global auth for all business routes
+app.use('/api', authenticate);
+
+// Protected routes
 app.use('/api/bookings', bookingsRouter);
 app.use('/api/vehicles', vehiclesRouter);
 app.use('/api/drivers', driversRouter);
@@ -47,14 +59,8 @@ app.use('/api/deliveries', deliveriesRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/receivings', receivingsRouter);
 app.use('/api/delivery-persons', deliveryPersonsRouter);
-app.use('/api/auth', authRouter);
-app.use('/api/track', trackingRouter);
 app.use('/api/dataio', dataioRouter);
 app.use('/api/lrr-search', lrrSearchRouter);
-
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok' });
-});
 
 app.get('/api/search', (req, res) => {
   const q = (req.query.q as string || '').trim();

@@ -125,9 +125,12 @@ export default function Dashboard() {
   const onNavigate = useNavigate();
 
   useEffect(() => {
+  const token = localStorage.getItem('token');
+  const headers: Record<string, string> = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
   Promise.all([
   api.dashboard.get(),
-  fetch('/api/dashboard/activity').then((r) => r.json()),
+  fetch('/api/dashboard/activity', { headers }).then((r) => r.json()),
   ]).then(([d, a]) => { setData(d); setActivity(a); }).catch(console.error);
   }, []);
 

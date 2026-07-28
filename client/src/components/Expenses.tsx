@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { api } from '../api';
+import { api, getHeaders } from '../api';
 import { Expense, Vehicle } from '../types';
 import { Plus, Trash2, Receipt, Printer, FileText, Pencil } from 'lucide-react';
 import Modal from './Modal';
@@ -69,7 +69,7 @@ export default function Expenses() {
  api.expenses.list({ category: filterCat || undefined }).then(setExpenses),
  api.expenses.categories().then(setCategories),
  api.vehicles.list().then(setVehicles),
- fetch('/api/warehouses').then((r) => r.json()).then(setWarehouses),
+ fetch('/api/warehouses', { headers: getHeaders() }).then((r) => r.json()).then(setWarehouses),
  ]);
 
  useEffect(() => { load(); }, [filterCat]);

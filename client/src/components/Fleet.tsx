@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { api } from '../api';
+import { api, getHeaders } from '../api';
 import { Truck, User, Phone, FileText, Calendar, Plus, Edit2, Trash2 } from 'lucide-react';
 import Modal from './Modal';
 
@@ -42,7 +42,7 @@ export default function Fleet() {
  driver_emergency_contact: '', driver_emergency_phone: '', driver_address: '', driver_status: 'Active',
  });
 
- const load = () => fetch('/api/fleet').then((r) => r.json()).then(setFleet);
+ const load = () => fetch('/api/fleet', { headers: getHeaders() }).then((r) => r.json()).then(setFleet);
 
  useEffect(() => { load(); }, []);
 
