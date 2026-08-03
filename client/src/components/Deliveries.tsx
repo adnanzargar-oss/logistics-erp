@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { api } from '../api';
+import { api, getHeaders } from '../api';
 import { Booking, DeliveryPerson } from '../types';
 import { Package, Trash2, Printer, Eye, Plus, Edit2, X, Camera } from 'lucide-react';
 import Modal from './Modal';
@@ -177,9 +177,9 @@ export default function Deliveries({ tabs, actions }: { tabs?: string[] | null; 
  api.deliveryPersons.list().then(setDeliveryPersons);
  }, []);
 
- const load = useCallback(() => {
- Promise.all([
- fetch('/api/deliveries').then((r) => r.json()).then(setDeliveries),
+  const load = useCallback(() => {
+  Promise.all([
+  fetch('/api/deliveries', { headers: getHeaders() }).then((r) => r.json()).then(setDeliveries),
  api.bookings.list().then((all) => {
  const loaded = all.filter((b: Booking) => b.loaded === 1 && !b.out_for_delivery && b.delivered !== 1);
  setAvailableLRs(loaded);
@@ -192,7 +192,7 @@ export default function Deliveries({ tabs, actions }: { tabs?: string[] | null; 
 
  useEffect(() => {
  const id = consumeDetailId();
- if (id) fetch(`/api/deliveries/${id}`).then(r => r.json()).then(setDetail);
+  if (id) fetch(`/api/deliveries/${id}`, { headers: getHeaders() }).then(r => r.json()).then(setDetail);
  }, []);
 
  const toggleLR = (id: number) => {
@@ -205,11 +205,11 @@ export default function Deliveries({ tabs, actions }: { tabs?: string[] | null; 
  if (unpaid.length > 0) {
  if (!confirm(`${unpaid.length} unpaid LR(s) selected. Invoice(s) will be printed. Continue?`)) return;
  }
- await fetch('/api/deliveries', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ delivery_date: deliveryDate, delivery_person_id: selectedDP || undefined, booking_ids: selectedLRs }),
- });
+  await fetch('/api/deliveries', {
+  method: 'POST',
+  headers: getHeaders(),
+  body: JSON.stringify({ delivery_date: deliveryDate, delivery_person_id: selectedDP || undefined, booking_ids: selectedLRs }),
+  });
  if (unpaid.length > 0) {
  const combined = unpaid.map((b) => invoiceHTML(b)).join('<div style="page-break-after:always"></div>');
  const win = window.open('', '_blank');
@@ -227,17 +227,17 @@ export default function Deliveries({ tabs, actions }: { tabs?: string[] | null; 
 
  const remove = async (id: number) => {
  if (confirm('Remove this delivery?')) {
- await fetch(`/api/deliveries/${id}`, { method: 'DELETE' });
+  await fetch(`/api/deliveries/${id}`, { method: 'DELETE', headers: getHeaders() });
  load();
  }
  };
 
  const searchDelivery = async () => {
  if (!confirmDeliveryNo.trim()) return;
- const res = await fetch(`/api/deliveries`).then(r => r.json());
- const found = res.find((d: any) => d.delivery_no === confirmDeliveryNo.trim() && d.status === 'Out for Delivery');
- if (!found) { alert('Delivery not found or already delivered'); return; }
- const full = await fetch(`/api/deliveries/${found.id}`).then(r => r.json());
+  const res = await fetch(`/api/deliveries`, { headers: getHeaders() }).then(r => r.json());
+  const found = res.find((d: any) => d.delivery_no === confirmDeliveryNo.trim() && d.status === 'Out for Delivery');
+  if (!found) { alert('Delivery not found or already delivered'); return; }
+  const full = await fetch(`/api/deliveries/${found.id}`, { headers: getHeaders() }).then(r => r.json());
  setConfirmDelivery(full);
  setConfirmSelected(new Set(full.bookings.map((b: any) => b.id)));
  };
@@ -245,11 +245,11 @@ export default function Deliveries({ tabs, actions }: { tabs?: string[] | null; 
  const confirmDelivered = async () => {
  if (!confirmDelivery) return;
  const deliveredIds = confirmDelivery.bookings.filter((b: any) => confirmSelected.has(b.id)).map((b: any) => b.id);
- await fetch(`/api/deliveries/${confirmDelivery.id}/confirm`, {
- method: 'PUT',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ delivered_ids: deliveredIds }),
- });
+  await fetch(`/api/deliveries/${confirmDelivery.id}/confirm`, {
+  method: 'PUT',
+  headers: getHeaders(),
+  body: JSON.stringify({ delivered_ids: deliveredIds }),
+  });
  setConfirmDelivery(null);
  setConfirmDeliveryNo('');
  load();
@@ -300,7 +300,7 @@ export default function Deliveries({ tabs, actions }: { tabs?: string[] | null; 
      <button onClick={() => setTab('delivered')} className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${tab === 'delivered' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Delivered</button>
    )}
    {allowedTabs.includes('dlrs') && (
-     <button onClick={() => { setTab('dlrs'); fetch('/api/deliveries/delivered/lrs').then(r => r.json()).then(setDeliveredLRs).then(() => setLoadingDelivered(false)); setLoadingDelivered(true); }} className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${tab === 'dlrs' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Delivered LRs</button>
+     <button onClick={() => { setTab('dlrs'); fetch('/api/deliveries/delivered/lrs', { headers: getHeaders() }).then(r => r.json()).then(setDeliveredLRs).then(() => setLoadingDelivered(false)); setLoadingDelivered(true); }} className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${tab === 'dlrs' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Delivered LRs</button>
    )}
    </div>
 
@@ -499,8 +499,8 @@ export default function Deliveries({ tabs, actions }: { tabs?: string[] | null; 
  </td>
  <td className="py-3 px-4">
  <div className="flex gap-1">
- <button onClick={async () => { const r = await fetch(`/api/deliveries/${d.id}`).then(r => r.json()); setDetail(r); }} className="p-1 hover:bg-gray-100 :bg-gray-800 rounded"><Eye size={14} className="text-gray-400 " /></button>
- <button onClick={async () => { const r = await fetch(`/api/deliveries/${d.id}`).then(r => r.json()); printDeliverySheet(r); }} className="p-1 hover:bg-blue-50 rounded"><Printer size={14} className="text-blue-400" /></button>
+  <button onClick={async () => { const r = await fetch(`/api/deliveries/${d.id}`, { headers: getHeaders() }).then(r => r.json()); setDetail(r); }} className="p-1 hover:bg-gray-100 :bg-gray-800 rounded"><Eye size={14} className="text-gray-400 " /></button>
+  <button onClick={async () => { const r = await fetch(`/api/deliveries/${d.id}`, { headers: getHeaders() }).then(r => r.json()); printDeliverySheet(r); }} className="p-1 hover:bg-blue-50 rounded"><Printer size={14} className="text-blue-400" /></button>
   {canDelete && <button onClick={() => remove(d.id!)} className="p-1 hover:bg-red-50 :bg-red-900/20 rounded"><Trash2 size={14} className="text-red-400" /></button>}
  </div>
  </td>
