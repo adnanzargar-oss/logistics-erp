@@ -172,7 +172,7 @@ function printReceivingSheet(receiving: any) {
 }
 
 export default function Receivings({ tabs }: { tabs?: string[] | null }) {
- const allowedTabs = tabs ? (['today', 'history'] as const).filter((t) => tabs.includes(t)) : ['today', 'history'];
+  const allowedTabs = tabs ? (['today', 'history'] as const).filter((t) => tabs.includes(t)) : (['today', 'history'] as const);
  const defaultTab = allowedTabs[0] || 'today';
  const [receivings, setReceivings] = useState<Receiving[]>([]);
  const [vehicles, setVehicles] = useState<Vehicle[]>([]);

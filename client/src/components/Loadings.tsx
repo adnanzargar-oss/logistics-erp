@@ -9,7 +9,7 @@ import { consumeDetailId } from '../hooks/useNavigate';
 export default function Loadings({ tabs, actions }: { tabs?: string[] | null; actions?: string[] | null }) {
   const canCreate = !actions || actions.includes('create');
   const canDelete = !actions || actions.includes('delete');
-  const allowedTabs = tabs ? (['new', 'transit', 'history'] as const).filter((t) => tabs.includes(t)) : ['new', 'transit', 'history'];
+  const allowedTabs = tabs ? (['new', 'transit', 'history'] as const).filter((t) => tabs.includes(t)) : (['new', 'transit', 'history'] as const);
   const defaultTab = allowedTabs[0] || 'new';
   const [loadings, setLoadings] = useState<Loading[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -120,8 +120,8 @@ export default function Loadings({ tabs, actions }: { tabs?: string[] | null; ac
   setSelectedLRs((prev) => prev.filter((x) => x !== id));
   };
 
-  const totalBags = (detail?.bookings || []).reduce((s, b) => s + (b.num_bags ?? 0), 0);
- const totalWeight = (detail?.bookings || []).reduce((s, b) => s + (b.charged_weight ?? b.actual_weight ?? 0), 0);
+  const totalBags = ((detail?.bookings || []) as Booking[]).reduce((s, b) => s + (b.num_bags ?? 0), 0);
+ const totalWeight = ((detail?.bookings || []) as Booking[]).reduce((s, b) => s + (b.charged_weight ?? b.actual_weight ?? 0), 0);
 
  return (
  <div>
@@ -466,7 +466,7 @@ export default function Loadings({ tabs, actions }: { tabs?: string[] | null; ac
  </tr>
  </thead>
  <tbody className="divide-y">
- {(detail.bookings || []).map((b) => (
+  {((detail.bookings || []) as Booking[]).map((b) => (
  <tr key={b.id} className="hover:bg-gray-50 :bg-gray-800 text-xs">
  <td className="py-2 px-3 font-mono font-medium">{b.booking_no}</td>
  <td className="py-2 px-3 max-w-[120px] truncate">{b.consignor_name || '-'}</td>

@@ -107,7 +107,7 @@ export default function POD() {
             </div>
           </div>
           <button onClick={startScanner} className="px-3 py-2 text-sm border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 font-medium flex items-center gap-1.5" title="Scan barcode"><Barcode size={15} /></button>
-          <button onClick={search} data-pod-search disabled={loading} className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium flex items-center gap-1.5 disabled:opacity-50"><Scan size={15} /> {loading ? 'Searching...' : 'Search'}</button>
+          <button onClick={() => search()} data-pod-search disabled={loading} className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium flex items-center gap-1.5 disabled:opacity-50"><Scan size={15} /> {loading ? 'Searching...' : 'Search'}</button>
         </div>
 
         {podResults.length === 0 && podSearch && !loading && (

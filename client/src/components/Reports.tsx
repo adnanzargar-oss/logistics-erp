@@ -239,7 +239,7 @@ export default function Reports() {
 
   /* ── Customer Report ── */
   const customerStats = useMemo(() => {
-    const custMap: Record<number, { name: string; bookings: number; revenue: number }> = {};
+    const custMap: Record<string, { name: string; bookings: number; revenue: number }> = {};
     for (const b of filteredBookings) {
       const key = b.consignor_name || 'Unknown';
       if (!custMap[key]) custMap[key] = { name: key, bookings: 0, revenue: 0 };

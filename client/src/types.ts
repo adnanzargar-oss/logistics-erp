@@ -137,6 +137,7 @@ export interface Booking {
   loaded?: number;
   delivered?: number;
   out_for_delivery?: number;
+  created_at?: string;
 
   // Legacy fields
   material?: string;

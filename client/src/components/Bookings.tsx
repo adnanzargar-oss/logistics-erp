@@ -24,7 +24,7 @@ const emptyForm = (): Booking => ({
  consignee_delivery_address: '',
  num_bags: undefined, type_of_packing: '', said_to_contain: '',
  actual_weight: undefined, charged_weight: undefined, private_marka: '',
- material_invoice_no: '', material_invoice_date: '', material_invoice_amt: '',
+ material_invoice_no: '', material_invoice_date: '', material_invoice_amt: undefined,
  freight: 0, eway_bill_charges: 0, previous_freight: 0, door_delivery: 0,
  consignment_charges: 0, other_charges: 0, total_charges: 0, discount: 0, grand_total: 0,
  eway_bill_no: '', eway_expiry_date: '',
@@ -43,7 +43,7 @@ export default function Bookings({ tabs, actions }: { tabs?: string[] | null; ac
   const canCreate = !actions || actions.includes('create');
   const canEdit = !actions || actions.includes('edit');
   const canDelete = !actions || actions.includes('delete');
-  const allowedTabs = tabs ? (['today', 'history'] as const).filter((t) => tabs.includes(t)) : ['today', 'history'];
+  const allowedTabs = tabs ? (['today', 'history'] as const).filter((t) => tabs.includes(t)) : (['today', 'history'] as const);
   const defaultTab = allowedTabs[0] || 'today';
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
