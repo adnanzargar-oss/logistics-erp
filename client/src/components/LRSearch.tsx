@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Search, X, FileText, ImageIcon, XCircle } from 'lucide-react';
+import { getHeaders } from '../api';
 
 const BASE = import.meta.env.VITE_API_URL || '/api';
 
@@ -33,7 +34,7 @@ export default function LRSearch() {
     if (!q) return;
     setBusy(true);
     try {
-      const res = await fetch(`${BASE}/lrr-search?q=${encodeURIComponent(q)}`);
+      const res = await fetch(`${BASE}/lrr-search?q=${encodeURIComponent(q)}`, { headers: getHeaders() });
       setResults(await res.json());
     } catch { setResults([]); } finally { setBusy(false); }
   };
